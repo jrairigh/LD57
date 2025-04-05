@@ -8,6 +8,7 @@ namespace LD57
         public float moveSpeed = 1;
         PlayerInput m_playerInput;
         InputAction m_moveAction;
+        Vector3 m_moveDirection;
 
         void Awake()
         {
@@ -18,24 +19,34 @@ namespace LD57
         void OnEnable()
         {
             m_moveAction.started += MovePlayer;
+            m_moveAction.canceled += StopPlayer;
         }
 
         void Onsable()
         {
             m_moveAction.started -= MovePlayer;
+            m_moveAction.canceled -= StopPlayer;
         }
 
         void Update()
         {
-
+            transform.position += moveSpeed * Time.deltaTime * m_moveDirection;
         }
 
         void MovePlayer(InputAction.CallbackContext context)
         {
             Vector2 input = context.ReadValue<Vector2>();
             Debug.Log($"Input: {input}");
-            Vector3 moveDirection = new Vector3(input.x, input.y, 0).normalized;
-            transform.position += moveSpeed * Time.deltaTime * moveDirection;
+            m_moveDirection.x = input.x;
+            m_moveDirection.y = input.y;
+            m_moveDirection.z = 0;
+        }
+
+        void StopPlayer(InputAction.CallbackContext context)
+        {
+            m_moveDirection.x = 0;
+            m_moveDirection.y = 0;
+            m_moveDirection.z = 0;
         }
     }
 }
