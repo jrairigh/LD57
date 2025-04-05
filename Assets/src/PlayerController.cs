@@ -10,6 +10,8 @@ namespace LD57
         public float rotationSpeed = 1;
         public int maxBullets = 10;
         public float shootDelay = 0.3f;
+        [Tooltip("Controls the spread of the bullets when fired.")]
+        public float bulletSprayCone = 15f;
         public BulletController bulletPrefab;
         public Transform bulletsParent;
         public Transform gun;
@@ -137,14 +139,27 @@ namespace LD57
             m_shootDelay = shootDelay;
             int nextBullet = m_bulletIndex;
             m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
-            m_bullets[nextBullet].OnShoot(gun.position, transform.rotation, m_moveDirection);
+
+            float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
+            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
+            bulletDirection.Normalize();
+            
+            m_bullets[nextBullet].OnShoot(gun.position, bulletDirection);
         }
 
         void OnDrawGizmos()
         {
+            // draw player facing direction
             const float rayLength = 3f;
             Gizmos.color = Color.green;
             Gizmos.DrawRay(transform.position, rayLength * transform.up);
+
+            // draw bullet cone
+            Gizmos.color = Color.red;
+            Vector3 left = Quaternion.Euler(0, 0, bulletSprayCone) * transform.up;
+            Vector3 right = Quaternion.Euler(0, 0, -bulletSprayCone) * transform.up;
+            Gizmos.DrawRay(gun.position, rayLength * left);
+            Gizmos.DrawRay(gun.position, rayLength * right);
         }
     }
 }
