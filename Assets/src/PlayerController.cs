@@ -8,6 +8,11 @@ namespace LD57
         public float moveSpeed = 1;
         public float strafeSpeed = 1;
         public float rotationSpeed = 1;
+        public int maxBullets = 10;
+        public float shootDelay = 0.3f;
+        public BulletController bulletPrefab;
+        public Transform bulletsParent;
+        public Transform gun;
         PlayerInput m_playerInput;
         InputAction m_moveAction;
         InputAction m_lookAction;
@@ -15,6 +20,11 @@ namespace LD57
         Vector3 m_moveDirection;
         Vector2 m_moveInput;
         float m_rotationDirection;
+        private BulletController[] m_bullets;
+        private int m_bulletIndex = 0;
+        private float m_shootDelay = 0;
+        private bool m_canShoot;
+        private bool m_isShooting;
 
         void Awake()
         {
@@ -25,13 +35,23 @@ namespace LD57
             Cursor.visible = false;
         }
 
+        void Start()
+        {
+            m_bullets = new BulletController[maxBullets];
+            for(int i = 0; i < maxBullets; ++i)
+            {
+                m_bullets[i] = Instantiate(bulletPrefab, transform.position, Quaternion.identity, bulletsParent);
+            }
+        }
+
         void OnEnable()
         {
             m_moveAction.started += MovePlayer;
             m_moveAction.canceled += StopPlayer;
             m_lookAction.started += OrientPlayerTowardsTarget;
             m_lookAction.canceled += StopPlayerRotation;
-            m_attackAction.performed += ShootWeapon;
+            m_attackAction.started += ShootWeapon;
+            m_attackAction.canceled += StopShootingWeapon;
         }
 
         void Onsable()
@@ -40,11 +60,14 @@ namespace LD57
             m_moveAction.canceled -= StopPlayer;
             m_lookAction.started -= OrientPlayerTowardsTarget;
             m_lookAction.canceled -= StopPlayerRotation;
-            m_attackAction.performed -= ShootWeapon;
+            m_attackAction.started -= ShootWeapon;
+            m_attackAction.canceled -= StopShootingWeapon;
         }
 
         void Update()
         {
+            FireBullets();
+
             transform.rotation *= Quaternion.Euler(0, 0, -rotationSpeed * Time.deltaTime * m_rotationDirection);
             m_moveDirection = transform.rotation * Vector3.up;
 
@@ -88,7 +111,33 @@ namespace LD57
 
         void ShootWeapon(InputAction.CallbackContext context)
         {
-            Debug.Log("Bang!");
+            m_isShooting = true;
+        }
+        
+        void StopShootingWeapon(InputAction.CallbackContext context)
+        {
+            m_isShooting = false;
+        }
+
+        void FireBullets()
+        {
+            if(!m_isShooting)
+            {
+                return;
+            }
+
+            m_canShoot = m_shootDelay <= 0;
+            m_shootDelay -= Time.deltaTime;
+
+            if(!m_canShoot)
+            {
+                return;
+            }
+
+            m_shootDelay = shootDelay;
+            int nextBullet = m_bulletIndex;
+            m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
+            m_bullets[nextBullet].OnShoot(gun.position, transform.rotation, m_moveDirection);
         }
 
         void OnDrawGizmos()
