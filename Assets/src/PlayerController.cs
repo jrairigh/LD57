@@ -19,6 +19,7 @@ namespace LD57
             m_playerInput = GetComponent<PlayerInput>();
             m_moveAction = m_playerInput.actions["Move"];
             m_lookAction = m_playerInput.actions["Look"];
+            Cursor.visible = false;
         }
 
         void OnEnable()
