@@ -10,17 +10,17 @@ public enum Team
 
 public class Killable : MonoBehaviour
 {
-    public UnityEvent<Killable> OnKilled;
-    public float MaxHealth = 100.0f;
-    public float Health = 100.0f;
-    public float PriorityTargettingRatio = 1.0f;
+    public UnityEvent<Killable> onKilled;
+    public float maxHealth = 100.0f;
+    public float health = 100.0f;
+    public float priorityTargettingRatio = 1.0f;
     public Team team = Team.Neutral;
 
     public void Start()
     {
-        if (OnKilled == null)
+        if (onKilled == null)
         {
-            OnKilled = new UnityEvent<Killable>();
+            onKilled = new UnityEvent<Killable>();
         }
     }
 
@@ -28,7 +28,7 @@ public class Killable : MonoBehaviour
     {
         if (healer.team == team)
         {
-            Health = Mathf.Min(Health + healAmount, MaxHealth);
+            health = Mathf.Min(health + healAmount, maxHealth);
         }
     }
 
@@ -40,11 +40,11 @@ public class Killable : MonoBehaviour
             return;
         }
 
-        Health -= damageAmount;
+        health -= damageAmount;
 
-        if (Health <= 0)
+        if (health <= 0)
         {
-            OnKilled?.Invoke(this);
+            onKilled?.Invoke(this);
             Destroy(gameObject);
         }
     }

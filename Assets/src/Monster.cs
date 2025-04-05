@@ -1,25 +1,23 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
-public class Monster : MonoBehaviour
+public abstract class Monster : MonoBehaviour
 {
     private const string PlayerTag = "Player";
     private const string TargetableTag = "Targetable";
 
-    public float MovementSpeed = 2.5f;
-    public float RotationSpeed = 10000f;
-    public float Damage = 20.0f;
-    public float DamageCooldown = 1;
-    public float AttackRange = 1;
+    public float movementSpeed = 2.5f;
+    public float rotationSpeed = 10000f;
+    public float attackDamage = 20.0f;
+    public float attackCooldown = 1;
+    public float attackRange = 1;
 
-    private List<Killable> Targetables = new();
-    private float lastAttackTime = float.MinValue;
+    private List<Killable> m_targetables = new();
+    private KillableTarget m_primaryTarget = null;
+    private KillableTarget m_lastPrimaryTarget = null;
+    private float m_lastAttackTime = float.MinValue;
 
     void Start()
     {
@@ -35,76 +33,102 @@ public class Monster : MonoBehaviour
 
     void OnDestroy()
     {
-        if (Targetables.Count > 0)
+        if (m_targetables.Count > 0)
         {
-            Targetables.ForEach(x => x.OnKilled.RemoveListener(RemoveTarget));
+            m_targetables.ForEach(x => x.onKilled.RemoveListener(RemoveTarget));
         }
     }
 
     void Update()
     {
-        var targetableGameObjects = SelectTarget();
-        if (targetableGameObjects == null)
+        m_primaryTarget = SelectTarget();
+        if (m_primaryTarget == null)
         {
             return;
         }
 
-        if (CanAttackTarget(targetableGameObjects))
+        if (CanAttackTarget(m_primaryTarget))
         {
-            AttackTarget(targetableGameObjects);
+            AttackTarget(m_primaryTarget);
         }
         else
         {
-            MoveTowardsTarget(targetableGameObjects);
+            MoveTowardsTarget(m_primaryTarget);
         }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.ConvertTo<Killable>())
+        var collisionKillable = collision.gameObject.GetComponent<Killable>();
+        if (collisionKillable == null)
+        {
+            return;
+        }
+
+       if (m_primaryTarget?.target == collisionKillable)
         {
             GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
+            m_lastPrimaryTarget = m_primaryTarget;
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        var collisionKillable = collision.gameObject.GetComponent<Killable>();
+        if (collisionKillable == null)
+        {
+            return;
+        }
+
+        if (m_lastPrimaryTarget.target != m_primaryTarget.target)
+        {
+            GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+            m_lastPrimaryTarget = null;
         }
     }
 
     void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.ConvertTo<Killable>())
+        var collisionKillable = collision.gameObject.GetComponent<Killable>();
+        if (collisionKillable == null)
+        {
+            return;
+        }
+
+        if (m_lastPrimaryTarget?.target != m_primaryTarget.target || m_primaryTarget?.target == collisionKillable)
         {
             GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+            m_lastPrimaryTarget = null;
         }
     }
 
-    protected bool CanAttackTarget(KillableTarget killableTarget)
+    protected virtual bool CanAttackTarget(KillableTarget killableTarget)
     {
-        return killableTarget.Distance < AttackRange;
+        return killableTarget.distance <= attackRange && m_lastAttackTime + attackCooldown <= Time.time;
     }
 
-    protected void AttackTarget(KillableTarget killableTarget)
-    {
-        DamageTarget(killableTarget.Target);
-    }
+    protected abstract void AttackTarget(KillableTarget killableTarget);
 
-    protected void MoveTowardsTarget(KillableTarget killableTarget)
+    protected virtual void MoveTowardsTarget(KillableTarget killableTarget)
     {
-        var target = killableTarget.Target;
+        var target = killableTarget.target;
         float angle = Mathf.Atan2(target.transform.position.y - transform.position.y, target.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
         GetComponent<Rigidbody2D>().MovePositionAndRotation(
-            Vector3.MoveTowards(transform.position, target.transform.position, Time.deltaTime * MovementSpeed),
-            Quaternion.RotateTowards(transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward), Time.deltaTime * RotationSpeed));
+            Vector3.MoveTowards(transform.position, target.transform.position, Time.deltaTime * movementSpeed),
+            Quaternion.RotateTowards(transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward), Time.deltaTime * rotationSpeed));
     }
 
     private KillableTarget SelectTarget()
     {
-        if (Targetables.Count == 0)
+        if (m_targetables.Count == 0)
         {
             return null;
         }
 
-        var targetables = Targetables.Select(target => new KillableTarget
+        var targetables = m_targetables.Select(target => new KillableTarget
         {
-            Target = target,
-            Distance = Vector3.Distance(target.transform.position, transform.position)
+            target = target,
+            distance = Vector3.Distance(target.transform.position, transform.position)
         });
 
         return targetables.Aggregate((currentMin, targetable) => SelectPriorityTarget(currentMin, targetable));
@@ -122,32 +146,31 @@ public class Monster : MonoBehaviour
 
     public void RemoveTarget(Killable killable)
     {
-        Targetables.Remove(killable);
+        m_targetables.Remove(killable);
     }
 
     public void AddTarget(Killable target)
     {
-        Targetables.Add(target);
-        target.OnKilled.AddListener(RemoveTarget);
+        m_targetables.Add(target);
+        target.onKilled.AddListener(RemoveTarget);
     }
 
-    private void DamageTarget(Killable target)
+    protected void DamageKillable(Killable target)
     {
-        if (lastAttackTime + DamageCooldown > Time.time)
+        if (m_lastAttackTime + attackCooldown > Time.time)
         {
             return;
         }
 
-        target.Damage(GetComponent<Killable>(), Damage);
-        lastAttackTime = Time.time;
+        target.Damage(GetComponent<Killable>(), attackDamage);
+        m_lastAttackTime = Time.time;
     }
 
     protected class KillableTarget
     {
-        public Killable Target;
-        public float Distance;
-        public float PriorityTargettingRatio;
+        public Killable target;
+        public float distance;
 
-        public float PriorityDistance => Distance / Target.PriorityTargettingRatio;
+        public float PriorityDistance => distance / target.priorityTargettingRatio;
     }
 }
