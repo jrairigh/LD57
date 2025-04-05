@@ -5,15 +5,13 @@ namespace LD57
 {
     public class PlayerController : MonoBehaviour
     {
+        [Tooltip("How quickly the player moves.")]
         public float moveSpeed = 1;
+        [Tooltip("How quickly the player strafes.")]
         public float strafeSpeed = 1;
+        [Tooltip("How quickly the player rotates.")]
         public float rotationSpeed = 1;
-        public int maxBullets = 10;
-        public float shootDelay = 0.3f;
-        [Tooltip("Controls the spread of the bullets when fired.")]
-        public float bulletSprayCone = 15f;
-        public BulletController bulletPrefab;
-        public Transform bulletsParent;
+
         public Transform gun;
         PlayerInput m_playerInput;
         InputAction m_moveAction;
@@ -24,26 +22,17 @@ namespace LD57
         float m_rotationDirection;
         private BulletController[] m_bullets;
         private int m_bulletIndex = 0;
-        private float m_shootDelay = 0;
-        private bool m_canShoot;
-        private bool m_isShooting;
+        private AimController m_aimController;
+
 
         void Awake()
         {
+            m_aimController = GetComponent<AimController>();
             m_playerInput = GetComponent<PlayerInput>();
             m_moveAction = m_playerInput.actions["Move"];
             m_lookAction = m_playerInput.actions["Look"];
             m_attackAction = m_playerInput.actions["Attack"];
             Cursor.visible = false;
-        }
-
-        void Start()
-        {
-            m_bullets = new BulletController[maxBullets];
-            for(int i = 0; i < maxBullets; ++i)
-            {
-                m_bullets[i] = Instantiate(bulletPrefab, transform.position, Quaternion.identity, bulletsParent);
-            }
         }
 
         void OnEnable()
@@ -68,8 +57,6 @@ namespace LD57
 
         void Update()
         {
-            FireBullets();
-
             transform.rotation *= Quaternion.Euler(0, 0, -rotationSpeed * Time.deltaTime * m_rotationDirection);
             m_moveDirection = transform.rotation * Vector3.up;
 
@@ -113,38 +100,12 @@ namespace LD57
 
         void ShootWeapon(InputAction.CallbackContext context)
         {
-            m_isShooting = true;
+            m_aimController.StartShooting();
         }
         
         void StopShootingWeapon(InputAction.CallbackContext context)
         {
-            m_isShooting = false;
-        }
-
-        void FireBullets()
-        {
-            if(!m_isShooting)
-            {
-                return;
-            }
-
-            m_canShoot = m_shootDelay <= 0;
-            m_shootDelay -= Time.deltaTime;
-
-            if(!m_canShoot)
-            {
-                return;
-            }
-
-            m_shootDelay = shootDelay;
-            int nextBullet = m_bulletIndex;
-            m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
-
-            float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
-            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
-            bulletDirection.Normalize();
-            
-            m_bullets[nextBullet].OnShoot(gun.position, bulletDirection);
+            m_aimController.StopShooting();
         }
 
         void OnDrawGizmos()
@@ -153,13 +114,6 @@ namespace LD57
             const float rayLength = 3f;
             Gizmos.color = Color.green;
             Gizmos.DrawRay(transform.position, rayLength * transform.up);
-
-            // draw bullet cone
-            Gizmos.color = Color.red;
-            Vector3 left = Quaternion.Euler(0, 0, bulletSprayCone) * transform.up;
-            Vector3 right = Quaternion.Euler(0, 0, -bulletSprayCone) * transform.up;
-            Gizmos.DrawRay(gun.position, rayLength * left);
-            Gizmos.DrawRay(gun.position, rayLength * right);
         }
     }
 }
