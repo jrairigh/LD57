@@ -7,6 +7,7 @@ namespace LD57
     {
         public float moveSpeed = 1;
         public float strafeSpeed = 1;
+        public float rotationSpeed = 1;
         PlayerInput m_playerInput;
         InputAction m_moveAction;
         InputAction m_lookAction;
@@ -36,7 +37,8 @@ namespace LD57
 
         void Update()
         {
-            Vector3 strafe = m_moveInput.x * transform.right;
+            float strafeOrientation = Mathf.Sign(Vector3.Dot(transform.up, Vector3.up));
+            Vector3 strafe = strafeOrientation * m_moveInput.x * transform.right;
             Vector3 moveDirection = m_moveDirection;
             moveDirection.x *= m_moveInput.y;
             moveDirection.y *= m_moveInput.y;
@@ -62,7 +64,7 @@ namespace LD57
             if (targetDirection != Vector3.zero)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(transform.forward, targetDirection);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360 * Time.deltaTime);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360 * Time.deltaTime * rotationSpeed);
                 m_moveDirection = transform.rotation * Vector3.up;
             }
         }
