@@ -11,14 +11,17 @@ namespace LD57
         PlayerInput m_playerInput;
         InputAction m_moveAction;
         InputAction m_lookAction;
+        InputAction m_attackAction;
         Vector3 m_moveDirection;
         Vector2 m_moveInput;
+        float m_rotationDirection;
 
         void Awake()
         {
             m_playerInput = GetComponent<PlayerInput>();
             m_moveAction = m_playerInput.actions["Move"];
             m_lookAction = m_playerInput.actions["Look"];
+            m_attackAction = m_playerInput.actions["Attack"];
             Cursor.visible = false;
         }
 
@@ -27,6 +30,8 @@ namespace LD57
             m_moveAction.started += MovePlayer;
             m_moveAction.canceled += StopPlayer;
             m_lookAction.started += OrientPlayerTowardsTarget;
+            m_lookAction.canceled += StopPlayerRotation;
+            m_attackAction.performed += ShootWeapon;
         }
 
         void Onsable()
@@ -34,10 +39,15 @@ namespace LD57
             m_moveAction.started -= MovePlayer;
             m_moveAction.canceled -= StopPlayer;
             m_lookAction.started -= OrientPlayerTowardsTarget;
+            m_lookAction.canceled -= StopPlayerRotation;
+            m_attackAction.performed -= ShootWeapon;
         }
 
         void Update()
         {
+            transform.rotation *= Quaternion.Euler(0, 0, -rotationSpeed * Time.deltaTime * m_rotationDirection);
+            m_moveDirection = transform.rotation * Vector3.up;
+
             float strafeOrientation = Mathf.Sign(Vector3.Dot(transform.up, Vector3.up));
             Vector3 strafe = strafeOrientation * m_moveInput.x * transform.right;
             Vector3 moveDirection = m_moveDirection;
@@ -61,13 +71,24 @@ namespace LD57
         void OrientPlayerTowardsTarget(InputAction.CallbackContext context)
         {
             Vector2 input = context.ReadValue<Vector2>();
-            Vector3 targetDirection = new Vector3(input.x, input.y, 0).normalized;
-            if (targetDirection != Vector3.zero)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(transform.forward, targetDirection);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360 * Time.deltaTime * rotationSpeed);
-                m_moveDirection = transform.rotation * Vector3.up;
-            }
+            m_rotationDirection = input.x;
+            //Vector3 targetDirection = new Vector3(input.x, input.y, 0).normalized;
+            //if (targetDirection != Vector3.zero)
+            //{
+            //    Quaternion targetRotation = Quaternion.LookRotation(transform.forward, targetDirection);
+            //    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360 * Time.deltaTime * rotationSpeed);
+            //    m_moveDirection = transform.rotation * Vector3.up;
+            //}
+        }
+
+        void StopPlayerRotation(InputAction.CallbackContext context)
+        {
+            m_rotationDirection = 0;
+        }
+
+        void ShootWeapon(InputAction.CallbackContext context)
+        {
+            Debug.Log("Bang!");
         }
 
         void OnDrawGizmos()
