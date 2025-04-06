@@ -18,8 +18,12 @@ namespace LD57
         public Transform bulletSpawnPoint;
         [Tooltip("The target to aim at.")]
         public Transform target;
+        [Tooltip("The sprite to use for bullets.")]
+        public Sprite sprite;
+
         public BulletController bulletPrefab;
         public Transform bulletsParent;
+
         private BulletController[] m_bullets;
         private int m_bulletIndex = 0;
         private float m_shootDelay = 0;
@@ -93,8 +97,7 @@ namespace LD57
             float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
             Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
             bulletDirection.Normalize();
-
-            m_bullets[nextBullet].OnShoot(GetComponent<Killable>(), bulletSpawnPoint.position, bulletDirection);
+            m_bullets[nextBullet].OnShoot(GetComponent<Killable>(), bulletSpawnPoint.position, bulletDirection, sprite);
         }
 
         void OnDrawGizmos()

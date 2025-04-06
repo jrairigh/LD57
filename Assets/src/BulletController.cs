@@ -10,18 +10,25 @@ namespace LD57
         public float lifetime = 2f;
         [Tooltip("How much damage the bullet does.")]
         public float bulletDamage = 10f;
+        public GameObject spriteGameObject;
         private Vector2 m_direction;
         private float m_lifetime;
         private Killable m_owner;
 
-        public void OnShoot(Killable owner, Vector2 position, Vector2 direction)
+        public void OnShoot(Killable owner, Vector2 position, Vector2 direction, Sprite sprite)
         {
             gameObject.SetActive(true);
             transform.position = position;
             transform.rotation = Quaternion.identity;
+            spriteGameObject.transform.rotation = Quaternion.FromToRotation(Vector2.zero, direction);
             m_direction = direction.normalized;
             m_lifetime = lifetime;
             m_owner = owner;
+
+            float angleDeg = Mathf.Rad2Deg * Mathf.Atan2(direction.y, direction.x);
+            spriteGameObject.transform.rotation = Quaternion.Euler(0, 0, angleDeg);
+
+            spriteGameObject.GetComponent<SpriteRenderer>().sprite = sprite;
         }
 
         void Update()
