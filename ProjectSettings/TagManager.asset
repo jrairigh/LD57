@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - bullet
+  - EventHandler
   layers:
   - Default
   - TransparentFX

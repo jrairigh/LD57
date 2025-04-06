@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 namespace LD57
 {
@@ -27,6 +27,7 @@ namespace LD57
         private float m_lastAttackTime = float.MinValue;
         private NavMeshAgent agent = null;
         private NavMeshPath path = null;
+        private KillableEventHandler killableEventHandler = null;
 
         public void DropLoot()
         {
@@ -56,19 +57,21 @@ namespace LD57
             var killables = GameObject.FindObjectsByType<Killable>(FindObjectsSortMode.None);
             foreach (var killable in killables)
             {
-                if (killable.team != Team.Neutral && killable.team != GetComponent<Killable>().team)
+                if (killable.team != Team.Neutral)
                 {
                     AddTarget(killable);
                 }
             }
+
+            killableEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<KillableEventHandler>();
+            killableEventHandler.onSpawned.AddListener(AddTarget);
+            killableEventHandler.onKilled.AddListener(RemoveTarget);
         }
 
         void OnDestroy()
         {
-            if (m_targetables.Count > 0)
-            {
-                m_targetables.ForEach(x => x.target.onKilled.RemoveListener(RemoveTarget));
-            }
+            killableEventHandler.onSpawned.RemoveListener(AddTarget);
+            killableEventHandler.onKilled.RemoveListener(RemoveTarget);
         }
 
         void Update()
@@ -164,6 +167,7 @@ namespace LD57
         private void UpdateDistanceToTarget(KillableTarget killableTarget)
         {
             var target = killableTarget.target;
+            path ??= new NavMeshPath();
             NavMesh.CalculatePath(transform.position, target.transform.position, NavMesh.AllAreas, path);
             if (path.status == NavMeshPathStatus.PathComplete)
             {
@@ -194,6 +198,11 @@ namespace LD57
 
         public void AddTarget(Killable target)
         {
+            if (target.team == GetComponent<Killable>().team)
+            {
+                return;
+            }
+
             var killableTarget = new KillableTarget
             {
                 target = target,
@@ -201,7 +210,6 @@ namespace LD57
             };
             UpdateDistanceToTarget(killableTarget);
             m_targetables.Add(killableTarget);
-            target.onKilled.AddListener(RemoveTarget);
         }
 
         protected void DamageKillable(Killable target)
