@@ -13,29 +13,23 @@ namespace LD57
         public float rotationSpeed = 1;
 
         public Transform gun;
+        public AimController aimController;
 
         private PlayerAnimationController m_animationControl;
-        private Sprite m_playerBulletSprite;
         private PlayerInput m_playerInput;
+        private SpriteRenderer m_playerSprite;
         private InputAction m_moveAction;
-        private InputAction m_lookAction;
         private InputAction m_attackAction;
-        private Vector3 m_moveDirection;
         private Vector2 m_moveInput;
-        private float m_rotationDirection;
-        private BulletController[] m_bullets;
-        private int m_bulletIndex = 0;
-        private AimController m_aimController;
+        private bool m_shooting;
 
         void Awake()
         {
             m_animationControl = GetComponent<PlayerAnimationController>();
-            m_aimController = GetComponent<AimController>();
             m_playerInput = GetComponent<PlayerInput>();
+            m_playerSprite = GetComponent<SpriteRenderer>();
             m_moveAction = m_playerInput.actions["Move"];
-            m_lookAction = m_playerInput.actions["Look"];
             m_attackAction = m_playerInput.actions["Attack"];
-            m_playerBulletSprite = Resources.Load<Sprite>("Sprites/player_bullet");
             Cursor.visible = false;
         }
 
@@ -43,8 +37,6 @@ namespace LD57
         {
             m_moveAction.performed += MovePlayer;
             m_moveAction.canceled += StopPlayer;
-            m_lookAction.started += OrientPlayerTowardsTarget;
-            m_lookAction.canceled += StopPlayerRotation;
             m_attackAction.started += ShootWeapon;
             m_attackAction.canceled += StopShootingWeapon;
         }
@@ -53,26 +45,38 @@ namespace LD57
         {
             m_moveAction.performed -= MovePlayer;
             m_moveAction.canceled -= StopPlayer;
-            m_lookAction.started -= OrientPlayerTowardsTarget;
-            m_lookAction.canceled -= StopPlayerRotation;
             m_attackAction.started -= ShootWeapon;
             m_attackAction.canceled -= StopShootingWeapon;
         }
 
         void Update()
         {
-            //transform.rotation *= Quaternion.Euler(0, 0, -rotationSpeed * Time.deltaTime * m_rotationDirection);
-            m_moveDirection = transform.rotation * Vector3.up;
-
-            //float strafeOrientation = Mathf.Sign(Vector3.Dot(transform.up, Vector3.up));
-            //Vector3 strafe = strafeOrientation * m_moveInput.x * transform.right;
             Vector3 moveDirection = new(m_moveInput.x, m_moveInput.y, 0);
 
             if (moveDirection.magnitude != 0)
             {
-                transform.position += Time.deltaTime * (moveSpeed * moveDirection);// + strafeSpeed * strafe);
+                transform.position += Time.deltaTime * (moveSpeed * moveDirection);
 
-                m_animationControl.FaceDirection(moveDirection.x);
+                if (!m_shooting)
+                {
+                    m_animationControl.FaceDirection(moveDirection.x);
+                }
+            }
+
+            if (m_shooting)
+            {
+                var mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                var angleToMouse = Mathf.Rad2Deg * Mathf.Atan2(mouseWorldPos.y - transform.position.y, mouseWorldPos.x - transform.position.x);
+                var angleDifference = Mathf.Abs(Mathf.DeltaAngle(m_playerSprite.flipX ? 180 : 0, angleToMouse));
+
+                if (!m_playerSprite.flipX)
+                {
+                    m_animationControl.FaceDirection(angleDifference >= 90 ? -1 : 1);
+                }
+                else
+                {
+                    m_animationControl.FaceDirection(angleDifference > 90 ? 1 : -1);
+                }
             }
         }
 
@@ -87,34 +91,18 @@ namespace LD57
             m_moveInput.y = 0;
         }
 
-        void OrientPlayerTowardsTarget(InputAction.CallbackContext context)
-        {
-            Vector2 input = context.ReadValue<Vector2>();
-            m_rotationDirection = input.x;
-            //Vector3 targetDirection = new Vector3(input.x, input.y, 0).normalized;
-            //if (targetDirection != Vector3.zero)
-            //{
-            //    Quaternion targetRotation = Quaternion.LookRotation(transform.forward, targetDirection);
-            //    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360 * Time.deltaTime * rotationSpeed);
-            //    m_moveDirection = transform.rotation * Vector3.up;
-            //}
-        }
-
-        void StopPlayerRotation(InputAction.CallbackContext context)
-        {
-            m_rotationDirection = 0;
-        }
-
         void ShootWeapon(InputAction.CallbackContext context)
         {
+            m_shooting = true;
             m_animationControl.DoShootingAnimation(true);
-            m_aimController.StartShooting();
+            aimController.StartShooting();
         }
         
         void StopShootingWeapon(InputAction.CallbackContext context)
         {
+            m_shooting = false;
             m_animationControl.DoShootingAnimation(false);
-            m_aimController.StopShooting();
+            aimController.StopShooting();
         }
 
         void OnDrawGizmos()

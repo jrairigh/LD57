@@ -6,8 +6,8 @@ namespace LD57
     {
         public float speed = 10f;
         public float lifetime = 2f;
+        public GameObject spriteGameObject;
 
-        private SpriteRenderer m_sprite;
         private Vector2 m_direction;
         private float m_lifetime;
 
@@ -16,15 +16,14 @@ namespace LD57
             gameObject.SetActive(true);
             transform.position = position;
             transform.rotation = Quaternion.identity;
+            spriteGameObject.transform.rotation = Quaternion.FromToRotation(Vector2.zero, direction);
             m_direction = direction.normalized;
             m_lifetime = lifetime;
 
-            m_sprite.sprite = sprite;
-        }
+            float angleDeg = Mathf.Rad2Deg * Mathf.Atan2(direction.y, direction.x);
+            spriteGameObject.transform.rotation = Quaternion.Euler(0, 0, angleDeg);
 
-        private void Awake()
-        {
-            m_sprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
+            spriteGameObject.GetComponent<SpriteRenderer>().sprite = sprite;
         }
 
         void Update()
