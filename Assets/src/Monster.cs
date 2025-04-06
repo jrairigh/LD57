@@ -15,7 +15,7 @@ namespace LD57
         public float attackDamage = 20.0f;
         public float attackCooldown = 1;
         public float attackRange = 1;
-
+        
         private List<KillableTarget> m_targetables = new();
         private KillableTarget m_primaryTarget = null;
         private KillableTarget m_lastPrimaryTarget = null;
@@ -49,7 +49,7 @@ namespace LD57
             }
         }
 
-        void Update()
+        protected virtual void Update()
         {
             m_primaryTarget = SelectTarget();
             if (m_primaryTarget == null)
@@ -115,7 +115,7 @@ namespace LD57
 
         protected virtual bool CanAttackTarget(KillableTarget killableTarget)
         {
-            return killableTarget.distance <= attackRange && m_lastAttackTime + attackCooldown <= Time.time;
+            return killableTarget.distance <= attackRange;
         }
 
         protected abstract void AttackTarget(KillableTarget killableTarget);
@@ -123,9 +123,12 @@ namespace LD57
         protected virtual void MoveTowardsTarget(KillableTarget killableTarget)
         {
             var target = killableTarget.target;
-            float angle = Mathf.Atan2(target.transform.position.y - transform.position.y, target.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
-            GetComponent<Rigidbody2D>().SetRotation(Quaternion.RotateTowards(transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward), Time.deltaTime * rotationSpeed));
             agent.SetDestination(target.transform.position);
+        }
+
+        protected void PauseAgent(bool pause)
+        {
+            agent.enabled = !pause;
         }
 
         private KillableTarget SelectTarget()
@@ -184,11 +187,6 @@ namespace LD57
 
         protected void DamageKillable(Killable target)
         {
-            if (m_lastAttackTime + attackCooldown > Time.time)
-            {
-                return;
-            }
-
             target.Damage(GetComponent<Killable>(), attackDamage);
             m_lastAttackTime = Time.time;
         }
