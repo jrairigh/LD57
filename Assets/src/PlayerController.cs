@@ -15,25 +15,30 @@ namespace LD57
         public BulletController bulletPrefab;
         public Transform bulletsParent;
         public Transform gun;
-        PlayerInput m_playerInput;
-        InputAction m_moveAction;
-        InputAction m_lookAction;
-        InputAction m_attackAction;
-        Vector3 m_moveDirection;
-        Vector2 m_moveInput;
-        float m_rotationDirection;
+
+        private PlayerAnimationController m_animationControl;
+        private PlayerInput m_playerInput;
+        private InputAction m_moveAction;
+        private InputAction m_lookAction;
+        private InputAction m_attackAction;
+        private Vector3 m_moveDirection;
+        private Vector2 m_moveInput;
+        private float m_rotationDirection;
         private BulletController[] m_bullets;
         private int m_bulletIndex = 0;
         private float m_shootDelay = 0;
         private bool m_canShoot;
         private bool m_isShooting;
+        private Sprite m_playerBulletSprite;
 
         void Awake()
         {
+            m_animationControl = GetComponent<PlayerAnimationController>();
             m_playerInput = GetComponent<PlayerInput>();
             m_moveAction = m_playerInput.actions["Move"];
             m_lookAction = m_playerInput.actions["Look"];
             m_attackAction = m_playerInput.actions["Attack"];
+            m_playerBulletSprite = Resources.Load<Sprite>("Sprites/player_bullet");
             Cursor.visible = false;
         }
 
@@ -48,7 +53,7 @@ namespace LD57
 
         void OnEnable()
         {
-            m_moveAction.started += MovePlayer;
+            m_moveAction.performed += MovePlayer;
             m_moveAction.canceled += StopPlayer;
             m_lookAction.started += OrientPlayerTowardsTarget;
             m_lookAction.canceled += StopPlayerRotation;
@@ -56,9 +61,9 @@ namespace LD57
             m_attackAction.canceled += StopShootingWeapon;
         }
 
-        void Onsable()
+        void OnDisable()
         {
-            m_moveAction.started -= MovePlayer;
+            m_moveAction.performed -= MovePlayer;
             m_moveAction.canceled -= StopPlayer;
             m_lookAction.started -= OrientPlayerTowardsTarget;
             m_lookAction.canceled -= StopPlayerRotation;
@@ -70,21 +75,24 @@ namespace LD57
         {
             FireBullets();
 
-            transform.rotation *= Quaternion.Euler(0, 0, -rotationSpeed * Time.deltaTime * m_rotationDirection);
+            //transform.rotation *= Quaternion.Euler(0, 0, -rotationSpeed * Time.deltaTime * m_rotationDirection);
             m_moveDirection = transform.rotation * Vector3.up;
 
-            float strafeOrientation = Mathf.Sign(Vector3.Dot(transform.up, Vector3.up));
-            Vector3 strafe = strafeOrientation * m_moveInput.x * transform.right;
-            Vector3 moveDirection = m_moveDirection;
-            moveDirection.x *= m_moveInput.y;
-            moveDirection.y *= m_moveInput.y;
-            moveDirection.z = 0;
-            transform.position += Time.deltaTime * (moveSpeed * moveDirection + strafeSpeed * strafe);
+            //float strafeOrientation = Mathf.Sign(Vector3.Dot(transform.up, Vector3.up));
+            //Vector3 strafe = strafeOrientation * m_moveInput.x * transform.right;
+            Vector3 moveDirection = new(m_moveInput.x, m_moveInput.y, 0);
+
+            if (moveDirection.magnitude != 0)
+            {
+                transform.position += Time.deltaTime * (moveSpeed * moveDirection);// + strafeSpeed * strafe);
+
+                m_animationControl.FaceDirection(moveDirection.x);
+            }
         }
 
         void MovePlayer(InputAction.CallbackContext context)
         {
-            m_moveInput += context.ReadValue<Vector2>();
+            m_moveInput = context.ReadValue<Vector2>();
         }
 
         void StopPlayer(InputAction.CallbackContext context)
@@ -114,11 +122,13 @@ namespace LD57
         void ShootWeapon(InputAction.CallbackContext context)
         {
             m_isShooting = true;
+            m_animationControl.DoShootingAnimation(true);
         }
         
         void StopShootingWeapon(InputAction.CallbackContext context)
         {
             m_isShooting = false;
+            m_animationControl.DoShootingAnimation(false);
         }
 
         void FireBullets()
@@ -144,7 +154,7 @@ namespace LD57
             Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
             bulletDirection.Normalize();
             
-            m_bullets[nextBullet].OnShoot(gun.position, bulletDirection);
+            m_bullets[nextBullet].OnShoot(gun.position, bulletDirection, m_playerBulletSprite);
         }
 
         void OnDrawGizmos()

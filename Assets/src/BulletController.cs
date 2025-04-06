@@ -6,16 +6,25 @@ namespace LD57
     {
         public float speed = 10f;
         public float lifetime = 2f;
+
+        private SpriteRenderer m_sprite;
         private Vector2 m_direction;
         private float m_lifetime;
 
-        public void OnShoot(Vector2 position, Vector2 direction)
+        public void OnShoot(Vector2 position, Vector2 direction, Sprite sprite)
         {
             gameObject.SetActive(true);
             transform.position = position;
             transform.rotation = Quaternion.identity;
             m_direction = direction.normalized;
             m_lifetime = lifetime;
+
+            m_sprite.sprite = sprite;
+        }
+
+        private void Awake()
+        {
+            m_sprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
         }
 
         void Update()
