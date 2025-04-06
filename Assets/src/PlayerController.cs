@@ -11,8 +11,8 @@ namespace LD57
         public float strafeSpeed = 1;
         [Tooltip("How quickly the player rotates.")]
         public float rotationSpeed = 1;
-
-        public Transform gun;
+        [Tooltip("How much money the player has.")]
+        public int money = 100;
         PlayerInput m_playerInput;
         InputAction m_moveAction;
         InputAction m_lookAction;
@@ -20,10 +20,17 @@ namespace LD57
         Vector3 m_moveDirection;
         Vector2 m_moveInput;
         float m_rotationDirection;
-        private BulletController[] m_bullets;
-        private int m_bulletIndex = 0;
         private AimController m_aimController;
 
+        public void AddMoney(int amount)
+        {
+            money += amount;
+        }
+        
+        public void RemoveMoney(int amount)
+        {
+            money -= amount;
+        }
 
         void Awake()
         {

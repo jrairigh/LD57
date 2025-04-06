@@ -49,7 +49,7 @@ namespace LD57
         {
             FireBullets();
 
-            if(autoAim)
+            if(autoAim && target != null)
             {
                 Vector3 direction = (target.position - transform.position).normalized;
                 float angle = (Mathf.Atan2(direction.y, direction.x) - Mathf.PI * 0.5f) * Mathf.Rad2Deg;
@@ -61,6 +61,10 @@ namespace LD57
                 Vector3 right = Quaternion.Euler(0, 0, -bulletSprayCone) * transform.up;
                 Vector3 targetDirection = target.position - bulletSpawnPoint.position;
                 m_isShooting = Vector3.Cross(left, targetDirection).z < 0 && Vector3.Cross(-right, targetDirection).z < 0;
+            }
+            else
+            {
+                m_isShooting = false;
             }
         }
 
@@ -87,7 +91,7 @@ namespace LD57
             Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
             bulletDirection.Normalize();
             
-            m_bullets[nextBullet].OnShoot(bulletSpawnPoint.position, bulletDirection);
+            m_bullets[nextBullet].OnShoot(GetComponent<Killable>(), bulletSpawnPoint.position, bulletDirection);
         }
 
         void OnDrawGizmos()
