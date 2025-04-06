@@ -91,7 +91,7 @@ namespace LD57
                 return;
             }
 
-            if (m_lastPrimaryTarget.target != m_primaryTarget.target)
+            if (m_lastPrimaryTarget?.target != m_primaryTarget?.target)
             {
                 agent.isStopped = false;
                 m_lastPrimaryTarget = null;
@@ -106,7 +106,7 @@ namespace LD57
                 return;
             }
 
-            if (m_lastPrimaryTarget?.target != m_primaryTarget.target || m_primaryTarget?.target == collisionKillable)
+            if (m_lastPrimaryTarget?.target != m_primaryTarget?.target || m_primaryTarget?.target == collisionKillable)
             {
                 agent.isStopped = false;
                 m_lastPrimaryTarget = null;
