@@ -1,51 +1,54 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum Team
+namespace LD57
 {
-    Neutral,
-    Team1,
-    Team2
-}
-
-public class Killable : MonoBehaviour
-{
-    public UnityEvent<Killable> onKilled;
-    public float maxHealth = 100.0f;
-    public float health = 100.0f;
-    public float priorityTargettingRatio = 1.0f;
-    public Team team = Team.Neutral;
-
-    public void Start()
+    public enum Team
     {
-        if (onKilled == null)
-        {
-            onKilled = new UnityEvent<Killable>();
-        }
+        Neutral,
+        Team1,
+        Team2
     }
 
-    public void Heal(Killable healer, float healAmount)
+    public class Killable : MonoBehaviour
     {
-        if (healer.team == team)
+        public UnityEvent<Killable> onKilled;
+        public float maxHealth = 100.0f;
+        public float health = 100.0f;
+        public float priorityTargettingRatio = 1.0f;
+        public Team team = Team.Neutral;
+
+        public void Start()
         {
-            health = Mathf.Min(health + healAmount, maxHealth);
+            if (onKilled == null)
+            {
+                onKilled = new UnityEvent<Killable>();
+            }
         }
-    }
 
-    public void Damage(Killable damager, float damageAmount)
-    {
-        if (damager.team == team)
+        public void Heal(Killable healer, float healAmount)
         {
-            // No friendly fire
-            return;
+            if (healer.team == team)
+            {
+                health = Mathf.Min(health + healAmount, maxHealth);
+            }
         }
 
-        health -= damageAmount;
-
-        if (health <= 0)
+        public void Damage(Killable damager, float damageAmount)
         {
-            onKilled?.Invoke(this);
-            Destroy(gameObject);
+            if (damager.team == team)
+            {
+                // No friendly fire
+                return;
+            }
+
+            health -= damageAmount;
+
+            if (health <= 0)
+            {
+                onKilled?.Invoke(this);
+                Destroy(gameObject);
+            }
         }
     }
 }

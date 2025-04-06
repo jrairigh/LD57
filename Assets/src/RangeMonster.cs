@@ -1,7 +1,10 @@
-public class RangeMonster : Monster
+namespace LD57
 {
-    protected override void AttackTarget(KillableTarget killableTarget)
+    public class RangeMonster : Monster
     {
-        // shoot
+        protected override void AttackTarget(KillableTarget killableTarget)
+        {
+            // shoot
+        }
     }
 }

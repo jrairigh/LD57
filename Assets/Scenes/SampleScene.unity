@@ -1072,6 +1072,37 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!1 &1684212241
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1684212242}
+  m_Layer: 0
+  m_Name: gun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1684212242
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1684212241}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.54, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1970460808}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1723916854 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7208896483448703659, guid: 277af5fdbeef80b4a887433d6bcd5bb8, type: 3}
@@ -1100,6 +1131,7 @@ GameObject:
   - component: {fileID: 1970460809}
   - component: {fileID: 1970460810}
   - component: {fileID: 1970460811}
+  - component: {fileID: 1970460812}
   m_Layer: 0
   m_Name: player
   m_TagString: Player
@@ -1122,6 +1154,7 @@ Transform:
   m_Children:
   - {fileID: 1409067751}
   - {fileID: 2098305157}
+  - {fileID: 1684212242}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1970460809
@@ -1139,7 +1172,7 @@ MonoBehaviour:
   moveSpeed: 5
   strafeSpeed: 5
   rotationSpeed: 360
-  gun: {fileID: 0}
+  gun: {fileID: 1684212242}
 --- !u!114 &1970460810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1265,6 +1298,27 @@ MonoBehaviour:
   health: 100
   priorityTargettingRatio: 1.5
   team: 1
+--- !u!114 &1970460812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970460806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08396d79e0571174f8c3c71e0ed75f20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trackingSpeed: 180
+  shootDelay: 0.1
+  bulletSprayCone: 15
+  maxBullets: 20
+  autoAim: 0
+  bulletSpawnPoint: {fileID: 1684212242}
+  target: {fileID: 0}
+  bulletPrefab: {fileID: 1723916857}
+  bulletsParent: {fileID: 679392179}
 --- !u!1 &2098305156
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,7 +1,10 @@
-public class MeleeMonster : Monster
+namespace LD57
 {
-    protected override void AttackTarget(KillableTarget killableTarget)
+    public class MeleeMonster : Monster
     {
-        DamageKillable(killableTarget.target);
+        protected override void AttackTarget(KillableTarget killableTarget)
+        {
+            DamageKillable(killableTarget.target);
+        }
     }
 }
