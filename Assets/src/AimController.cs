@@ -39,7 +39,7 @@ namespace LD57
         void Start()
         {
             m_bullets = new BulletController[maxBullets];
-            for(int i = 0; i < maxBullets; ++i)
+            for (int i = 0; i < maxBullets; ++i)
             {
                 m_bullets[i] = Instantiate(bulletPrefab, transform.position, Quaternion.identity, bulletsParent);
             }
@@ -49,28 +49,31 @@ namespace LD57
         {
             FireBullets();
 
-            if(autoAim && target != null)
+            if (autoAim)
             {
-                Vector3 direction = (target.position - transform.position).normalized;
-                float angle = (Mathf.Atan2(direction.y, direction.x) - Mathf.PI * 0.5f) * Mathf.Rad2Deg;
-                Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, trackingSpeed * Time.deltaTime);
+                if (target != null)
+                {
+                    Vector3 direction = (target.position - transform.position).normalized;
+                    float angle = (Mathf.Atan2(direction.y, direction.x) - Mathf.PI * 0.5f) * Mathf.Rad2Deg;
+                    Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, trackingSpeed * Time.deltaTime);
 
-                // start shooting if target withing the spray cone
-                Vector3 left = Quaternion.Euler(0, 0, bulletSprayCone) * transform.up;
-                Vector3 right = Quaternion.Euler(0, 0, -bulletSprayCone) * transform.up;
-                Vector3 targetDirection = target.position - bulletSpawnPoint.position;
-                m_isShooting = Vector3.Cross(left, targetDirection).z < 0 && Vector3.Cross(-right, targetDirection).z < 0;
-            }
-            else
-            {
-                m_isShooting = false;
+                    // start shooting if target withing the spray cone
+                    Vector3 left = Quaternion.Euler(0, 0, bulletSprayCone) * transform.up;
+                    Vector3 right = Quaternion.Euler(0, 0, -bulletSprayCone) * transform.up;
+                    Vector3 targetDirection = target.position - bulletSpawnPoint.position;
+                    m_isShooting = Vector3.Cross(left, targetDirection).z < 0 && Vector3.Cross(-right, targetDirection).z < 0;
+                }
+                else
+                {
+                    m_isShooting = false;
+                }
             }
         }
 
         void FireBullets()
         {
-            if(!m_isShooting)
+            if (!m_isShooting)
             {
                 return;
             }
@@ -78,7 +81,7 @@ namespace LD57
             m_canShoot = m_shootDelay <= 0;
             m_shootDelay -= Time.deltaTime;
 
-            if(!m_canShoot)
+            if (!m_canShoot)
             {
                 return;
             }
@@ -90,7 +93,7 @@ namespace LD57
             float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
             Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
             bulletDirection.Normalize();
-            
+
             m_bullets[nextBullet].OnShoot(GetComponent<Killable>(), bulletSpawnPoint.position, bulletDirection);
         }
 
