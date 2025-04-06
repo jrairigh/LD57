@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 namespace LD57
 {
@@ -15,13 +16,35 @@ namespace LD57
         public float attackDamage = 20.0f;
         public float attackCooldown = 1;
         public float attackRange = 1;
-
+        [Tooltip("How much coins the monster holds")]
+        public int purseSize = 10;
+        [Tooltip("How much force to apply to the coins when they are dropped")]
+        public float coinExplosionForce = 10.0f;
+        public Coin coinPrefab;
         private List<KillableTarget> m_targetables = new();
         private KillableTarget m_primaryTarget = null;
         private KillableTarget m_lastPrimaryTarget = null;
         private float m_lastAttackTime = float.MinValue;
         private NavMeshAgent agent = null;
         private NavMeshPath path = null;
+        private KillableEventHandler killableEventHandler = null;
+
+        public void DropLoot()
+        {
+            Coin[] coins = new Coin[purseSize];
+            for(int i = 0; i < purseSize; ++i)
+            {
+                coins[i] = Instantiate(coinPrefab, transform.position, Quaternion.identity);
+                coins[i].gameObject.SetActive(true);
+            }
+
+            foreach (var coin in coins)
+            {
+                Rigidbody2D rb = coin.GetComponent<Rigidbody2D>();
+                Vector2 force = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+                rb.AddForce(coinExplosionForce * force, ForceMode2D.Impulse);
+            }
+        }
 
         void Start()
         {
@@ -34,19 +57,21 @@ namespace LD57
             var killables = GameObject.FindObjectsByType<Killable>(FindObjectsSortMode.None);
             foreach (var killable in killables)
             {
-                if (killable.team != Team.Neutral && killable.team != GetComponent<Killable>().team)
+                if (killable.team != Team.Neutral)
                 {
                     AddTarget(killable);
                 }
             }
+
+            killableEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<KillableEventHandler>();
+            killableEventHandler.onSpawned.AddListener(AddTarget);
+            killableEventHandler.onKilled.AddListener(RemoveTarget);
         }
 
         void OnDestroy()
         {
-            if (m_targetables.Count > 0)
-            {
-                m_targetables.ForEach(x => x.target.onKilled.RemoveListener(RemoveTarget));
-            }
+            killableEventHandler.onSpawned.RemoveListener(AddTarget);
+            killableEventHandler.onKilled.RemoveListener(RemoveTarget);
         }
 
         void Update()
@@ -142,6 +167,7 @@ namespace LD57
         private void UpdateDistanceToTarget(KillableTarget killableTarget)
         {
             var target = killableTarget.target;
+            path ??= new NavMeshPath();
             NavMesh.CalculatePath(transform.position, target.transform.position, NavMesh.AllAreas, path);
             if (path.status == NavMeshPathStatus.PathComplete)
             {
@@ -172,6 +198,11 @@ namespace LD57
 
         public void AddTarget(Killable target)
         {
+            if (target.team == GetComponent<Killable>().team)
+            {
+                return;
+            }
+
             var killableTarget = new KillableTarget
             {
                 target = target,
@@ -179,7 +210,6 @@ namespace LD57
             };
             UpdateDistanceToTarget(killableTarget);
             m_targetables.Add(killableTarget);
-            target.onKilled.AddListener(RemoveTarget);
         }
 
         protected void DamageKillable(Killable target)
