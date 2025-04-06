@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 9156541901348076028}
   - component: {fileID: 1219209244705250679}
   - component: {fileID: 4091425227126582380}
+  - component: {fileID: 4298553605072631139}
   m_Layer: 0
   m_Name: RangeMonster
   m_TagString: Untagged
@@ -255,11 +256,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a170e3558d2fbb245a342524f7acb68f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MovementSpeed: 2
-  RotationSpeed: 10000
-  AttackDamage: 5
-  AttackCooldown: 1
-  AttackRange: 5
+  movementSpeed: 2.5
+  rotationSpeed: 10000
+  attackDamage: 20
+  attackCooldown: 1
+  attackRange: 1
 --- !u!114 &4091425227126582380
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,13 +273,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63c707ee8d1c6484e82e17d8a5187d8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnKilled:
+  onKilled:
     m_PersistentCalls:
       m_Calls: []
-  MaxHealth: 100
-  Health: 100
-  PriorityTargettingRatio: 1
+  maxHealth: 100
+  health: 100
+  priorityTargettingRatio: 1
   team: 2
+--- !u!195 &4298553605072631139
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973233317885841811}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 0.5
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &7684024021694331336
 GameObject:
   m_ObjectHideFlags: 0
