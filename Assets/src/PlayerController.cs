@@ -16,11 +16,8 @@ namespace LD57
         public AimController aimController;
         PlayerInput m_playerInput;
         InputAction m_moveAction;
-        InputAction m_lookAction;
         InputAction m_attackAction;
-        Vector3 m_moveDirection;
         Vector2 m_moveInput;
-        float m_rotationDirection;
         PlayerAnimationController m_animationControl;
         SpriteRenderer m_playerSprite;
         bool m_shooting;
@@ -28,11 +25,13 @@ namespace LD57
         public void AddMoney(int amount)
         {
             money += amount;
+            Debug.Log($"Player gained ${amount}, total in purse ${money}");
         }
         
         public void RemoveMoney(int amount)
         {
             money -= amount;
+            Debug.Log($"Player pays ${amount}, total in purse ${money}");
         }
 
         void Awake()

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,13 +16,34 @@ namespace LD57
         public float attackDamage = 20.0f;
         public float attackCooldown = 1;
         public float attackRange = 1;
-
+        [Tooltip("How much coins the monster holds")]
+        public int purseSize = 10;
+        [Tooltip("How much force to apply to the coins when they are dropped")]
+        public float coinExplosionForce = 10.0f;
+        public Coin coinPrefab;
         private List<KillableTarget> m_targetables = new();
         private KillableTarget m_primaryTarget = null;
         private KillableTarget m_lastPrimaryTarget = null;
         private float m_lastAttackTime = float.MinValue;
         private NavMeshAgent agent = null;
         private NavMeshPath path = null;
+
+        public void DropLoot()
+        {
+            Coin[] coins = new Coin[purseSize];
+            for(int i = 0; i < purseSize; ++i)
+            {
+                coins[i] = Instantiate(coinPrefab, transform.position, Quaternion.identity);
+                coins[i].gameObject.SetActive(true);
+            }
+
+            foreach (var coin in coins)
+            {
+                Rigidbody2D rb = coin.GetComponent<Rigidbody2D>();
+                Vector2 force = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+                rb.AddForce(coinExplosionForce * force, ForceMode2D.Impulse);
+            }
+        }
 
         void Start()
         {
