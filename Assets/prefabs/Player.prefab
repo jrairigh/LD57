@@ -109,6 +109,7 @@ MonoBehaviour:
   bulletSpawnPoint: {fileID: 5688660746329363277}
   target: {fileID: 0}
   sprite: {fileID: -2346302928887187388, guid: f17889f8211310f44a9ba073b7f1e86d, type: 3}
+  owner: {fileID: 9059953334327450599}
   bulletPrefab: {fileID: 8334179044058134890, guid: 277af5fdbeef80b4a887433d6bcd5bb8, type: 3}
   bulletsParent: {fileID: 0}
 --- !u!1 &2950595059589451667
@@ -198,6 +199,7 @@ MonoBehaviour:
   rotationSpeed: 1
   money: 100
   aimController: {fileID: 2841079968700389803}
+  turretPrefab: {fileID: 0}
 --- !u!114 &2661658988818625141
 MonoBehaviour:
   m_ObjectHideFlags: 0
