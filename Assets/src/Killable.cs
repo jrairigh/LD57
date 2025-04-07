@@ -34,13 +34,13 @@ namespace LD57
 
         public bool TryDamage(Killable damager, float damageAmount)
         {
-            if (damager.team == team)
+            if (damager.team == team || health <= 0)
             {
-                // No friendly fire
                 return false;
             }
 
             health -= damageAmount;
+            eventHandler?.NotifyOnDamaged(this);
 
             if (health <= 0)
             {

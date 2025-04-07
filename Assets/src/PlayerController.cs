@@ -14,26 +14,32 @@ namespace LD57
         [Tooltip("How much money the player has.")]
         public int money = 100;
         public AimController aimController;
-        GameObject m_turretPrefab;
-        PlayerInput m_playerInput;
-        InputAction m_moveAction;
-        InputAction m_attackAction;
-        InputAction m_interactAction;
-        Vector2 m_moveInput;
-        PlayerAnimationController m_animationControl;
-        SpriteRenderer m_playerSprite;
-        bool m_shooting;
-        Camera m_camera;
-        
+
+        private GameObject m_turretPrefab;
+        private PlayerInput m_playerInput;
+        private InputAction m_moveAction;
+        private InputAction m_attackAction;
+        private InputAction m_interactAction;
+        private Vector2 m_moveInput;
+        private PlayerAnimationController m_animationControl;
+        private SpriteRenderer m_playerSprite;
+        private bool m_shooting;
+        private Camera m_camera;
+        private Killable m_killable;
+        private KillableEventHandler killableEventHandler;
+        private GameRoundEventHandler gameRoundEventHandler;
+
         public void AddMoney(int amount)
         {
             money += amount;
+            gameRoundEventHandler.NotifyCoinChanged(money);
             Debug.Log($"Player gained ${amount}, total in purse ${money}");
         }
         
         public void RemoveMoney(int amount)
         {
             money -= amount;
+            gameRoundEventHandler.NotifyCoinChanged(money);
             Debug.Log($"Player pays ${amount}, total in purse ${money}");
         }
 
@@ -43,10 +49,15 @@ namespace LD57
             m_animationControl = GetComponent<PlayerAnimationController>();
             m_playerInput = GetComponent<PlayerInput>();
             m_playerSprite = GetComponent<SpriteRenderer>();
+            m_killable = GetComponent<Killable>();
             m_camera = Camera.main;
             m_moveAction = m_playerInput.actions["Move"];
             m_attackAction = m_playerInput.actions["Attack"];
             m_interactAction = m_playerInput.actions["Interact"];
+
+            killableEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<KillableEventHandler>();
+            gameRoundEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<GameRoundEventHandler>();
+
             Cursor.visible = false;
         }
 
@@ -57,6 +68,7 @@ namespace LD57
             m_attackAction.started += ShootWeapon;
             m_attackAction.canceled += StopShootingWeapon;
             m_interactAction.performed += PlaceItem;
+            killableEventHandler.onDamaged.AddListener(HandleOnDamaged);
         }
 
         void OnDisable()
@@ -66,6 +78,12 @@ namespace LD57
             m_attackAction.started -= ShootWeapon;
             m_attackAction.canceled -= StopShootingWeapon;
             m_interactAction.performed -= PlaceItem;
+            killableEventHandler.onDamaged.RemoveListener(HandleOnDamaged);
+        }
+
+        private void Start()
+        {
+            gameRoundEventHandler.NotifyCoinChanged(money);
         }
 
         void Update()
@@ -147,6 +165,16 @@ namespace LD57
             const float rayLength = 3f;
             Gizmos.color = Color.green;
             Gizmos.DrawRay(transform.position, rayLength * transform.up);
+        }
+
+        private void HandleOnDamaged(Killable killable)
+        {
+            if(killable != m_killable)
+            {
+                return;
+            }
+
+            gameRoundEventHandler.NotifyPlayerHealthChanged(killable);
         }
     }
 }
