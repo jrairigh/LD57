@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1599553923348517412}
   - component: {fileID: 2674034052329208442}
   m_Layer: 0
-  m_Name: bullet
+  m_Name: Bullet
   m_TagString: bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   lifetime: 2
+  bulletDamage: 10
   spriteGameObject: {fileID: 7650033685522506469}
 --- !u!58 &1599553923348517412
 CircleCollider2D:

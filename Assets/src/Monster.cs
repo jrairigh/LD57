@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
@@ -21,22 +19,16 @@ namespace LD57
         public int purseSize = 10;
         [Tooltip("How much force to apply to the coins when they are dropped")]
         public float coinExplosionForce = 10.0f;
-        public Coin coinPrefab;
-        
-        private List<KillableTarget> m_targetables = new();
-        private KillableTarget m_primaryTarget = null;
-        private KillableTarget m_lastPrimaryTarget = null;
-        private float m_lastAttackTime = float.MinValue;
-        private NavMeshAgent agent = null;
-        private NavMeshPath path = null;
-        private KillableEventHandler killableEventHandler = null;
+        private Coin m_coinPrefab;
+        private NavMeshAgent m_agent = null;
+        private AutoTargetSelector m_autoTargetSelector = null;
 
         public void DropLoot()
         {
             Coin[] coins = new Coin[purseSize];
             for(int i = 0; i < purseSize; ++i)
             {
-                coins[i] = Instantiate(coinPrefab, transform.position, Quaternion.identity);
+                coins[i] = Instantiate(m_coinPrefab, transform.position, Quaternion.identity);
                 coins[i].gameObject.SetActive(true);
             }
 
@@ -48,95 +40,46 @@ namespace LD57
             }
         }
 
-        void Start()
+        protected void Awake()
         {
-            agent = GetComponent<NavMeshAgent>();
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
-
-            path = new NavMeshPath();
-
-            var killables = GameObject.FindObjectsByType<Killable>(FindObjectsSortMode.None);
-            foreach (var killable in killables)
-            {
-                if (killable.team != Team.Neutral)
-                {
-                    AddTarget(killable);
-                }
-            }
-
-            killableEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<KillableEventHandler>();
-            killableEventHandler.onSpawned.AddListener(AddTarget);
-            killableEventHandler.onKilled.AddListener(RemoveTarget);
+            m_coinPrefab = Resources.Load<Coin>("Prefabs/Coin");
         }
 
+        void Start()
+        {
+            m_agent = GetComponent<NavMeshAgent>();
+            m_agent.updateRotation = false;
+            m_agent.updateUpAxis = false;
+
+            if (m_autoTargetSelector == null)
+            {
+                m_autoTargetSelector = new AutoTargetSelector(gameObject);
+            }
+
+            m_autoTargetSelector.onKilled.AddListener(KillableDied);
+            m_autoTargetSelector.DetectTargets();
+            m_autoTargetSelector.SetupTargetDetection();
+        }
         void OnDestroy()
         {
-            killableEventHandler.onSpawned.RemoveListener(AddTarget);
-            killableEventHandler.onKilled.RemoveListener(RemoveTarget);
+            m_autoTargetSelector.DisableTargetDetection();
         }
 
         protected virtual void Update()
         {
-            m_primaryTarget = SelectTarget();
-            if (m_primaryTarget == null)
+            var target = m_autoTargetSelector.SelectTarget();
+            if (target == null)
             {
                 return;
             }
 
-            if (CanAttackTarget(m_primaryTarget))
+            if (CanAttackTarget(target))
             {
-                AttackTarget(m_primaryTarget);
+                AttackTarget(target);
             }
             else
             {
-                MoveTowardsTarget(m_primaryTarget);
-            }
-        }
-
-        void OnCollisionEnter2D(Collision2D collision)
-        {
-            var collisionKillable = collision.gameObject.GetComponent<Killable>();
-            if (collisionKillable == null)
-            {
-                return;
-            }
-
-            if (m_primaryTarget?.target == collisionKillable)
-            {
-                agent.isStopped = true;
-                agent.velocity = Vector3.zero;
-                m_lastPrimaryTarget = m_primaryTarget;
-            }
-        }
-
-        private void OnCollisionStay2D(Collision2D collision)
-        {
-            var collisionKillable = collision.gameObject.GetComponent<Killable>();
-            if (collisionKillable == null)
-            {
-                return;
-            }
-
-            if (m_lastPrimaryTarget?.target != m_primaryTarget?.target)
-            {
-                agent.isStopped = false;
-                m_lastPrimaryTarget = null;
-            }
-        }
-
-        void OnCollisionExit2D(Collision2D collision)
-        {
-            var collisionKillable = collision.gameObject.GetComponent<Killable>();
-            if (collisionKillable == null)
-            {
-                return;
-            }
-
-            if (m_lastPrimaryTarget?.target != m_primaryTarget?.target || m_primaryTarget?.target == collisionKillable)
-            {
-                agent.isStopped = false;
-                m_lastPrimaryTarget = null;
+                MoveTowardsTarget(target);
             }
         }
 
@@ -149,96 +92,22 @@ namespace LD57
 
         protected virtual void MoveTowardsTarget(KillableTarget killableTarget)
         {
-            if (agent.enabled)
-            {
-                var target = killableTarget.target;
-                agent.SetDestination(target.transform.position);
-            }
-        }
-
-        protected void PauseAgent(bool pause)
-        {
-            agent.enabled = !pause;
-        }
-
-        private KillableTarget SelectTarget()
-        {
-            if (m_targetables.Count == 0)
-            {
-                return null;
-            }
-
-            m_targetables.ForEach(x => UpdateDistanceToTarget(x));
-            return m_targetables.Aggregate((currentMin, targetable) => SelectPriorityTarget(currentMin, targetable));
-        }
-
-        private void UpdateDistanceToTarget(KillableTarget killableTarget)
-        {
             var target = killableTarget.target;
-            path ??= new NavMeshPath();
-            NavMesh.CalculatePath(transform.position, target.transform.position, NavMesh.AllAreas, path);
-            if (path.status == NavMeshPathStatus.PathComplete)
-            {
-                float totalDistance = 0.0f;
-                for (int i = 0; i < path.corners.Length - 1; i++)
-                {
-                    totalDistance += Vector3.Distance(path.corners[i], path.corners[i + 1]);
-                }
-
-                killableTarget.distance = totalDistance;
-            }
+            float angle = Mathf.Atan2(target.transform.position.y - transform.position.y, target.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
+            m_agent.SetDestination(target.transform.position);
         }
 
-        private KillableTarget SelectPriorityTarget(KillableTarget currentTarget, KillableTarget newPotentialTarget)
+        public void KillableDied(Killable dead)
         {
-            if (currentTarget == null)
-            {
-                return newPotentialTarget;
-            }
-
-            return newPotentialTarget.PriorityDistance < currentTarget.PriorityDistance ? newPotentialTarget : currentTarget;
-        }
-
-        public void RemoveTarget(Killable killable)
-        {
-            if (killable == GetComponent<Killable>())
+            if (dead == GetComponent<Killable>())
             {
                 DropLoot();
             }
-            else
-            {
-                m_targetables.RemoveAll(x => x.target == killable);
-            }
-        }
-
-        public void AddTarget(Killable target)
-        {
-            if (target.team == GetComponent<Killable>().team)
-            {
-                return;
-            }
-
-            var killableTarget = new KillableTarget
-            {
-                target = target,
-                distance = float.MaxValue
-            };
-            UpdateDistanceToTarget(killableTarget);
-            m_targetables.Add(killableTarget);
         }
 
         protected void DamageKillable(Killable target)
         {
             target.TryDamage(GetComponent<Killable>(), attackDamage);
-            m_lastAttackTime = Time.time;
-        }
-
-        protected class KillableTarget
-        {
-            public Killable target;
-            public float distance;
-
-            public float PriorityDistance => distance / target.priorityTargettingRatio;
         }
     }
 }

@@ -14,8 +14,10 @@ namespace LD57
 
         private string currentAnimation => attackAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
 
-        protected void Awake()
+        new void Awake()
         {
+            base.Awake();
+
             sprite = GetComponent<SpriteRenderer>();
             attackAnimator = GetComponent<Animator>();
             attackAnimator.Play(idleAnimation);
@@ -52,7 +54,7 @@ namespace LD57
             if (currentAnimation != attackAnimation)
             {
                 attackAnimator.Play(attackAnimation);
-                PauseAgent(true);
+                //PauseAgent(true);
                 target = killableTarget;
             }
         }
@@ -60,7 +62,7 @@ namespace LD57
         private void AttackAnimationEnd()
         {
             attackAnimator.Play(idleAnimation);
-            PauseAgent(false);
+            //PauseAgent(false);
         }
     }
 }

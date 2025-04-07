@@ -1,4 +1,3 @@
-using Assets.src;
 using UnityEngine;
 
 namespace LD57
@@ -16,8 +15,10 @@ namespace LD57
 
         private string currentAnimation => attackAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
 
-        protected void Awake()
+        new void Awake()
         {
+            base.Awake();
+
             sprite = GetComponent<SpriteRenderer>();
             attackAnimator = GetComponent<Animator>();
             bulletSpawn = transform.GetChild(0);
@@ -36,14 +37,6 @@ namespace LD57
                 sprite.flipX = xDifference < 0;
             }
 
-            var target = aimController.target;
-
-            if (target != null && target.gameObject.scene.IsValid())
-            {
-                bulletSpawn.transform.rotation = 
-                    Quaternion.Euler(0, 0, Utility.AngleTo(bulletSpawn.transform.position, aimController.target.transform.position) - 90f);
-            }
-
             lastPosition = transform.position;
         }
 
@@ -57,15 +50,12 @@ namespace LD57
             if (currentAnimation != attackAnimation)
             {
                 attackAnimator.Play(attackAnimation);
-                aimController.target = killableTarget.target.transform;
-                PauseAgent(true);
             }
         }
 
         private void AttackAnimationEnd()
         {
             attackAnimator.Play(idleAnimation);
-            PauseAgent(false);
         }
     }
 }

@@ -220,8 +220,9 @@ GameObject:
   - component: {fileID: 8129612162710940874}
   - component: {fileID: 7595089413206539302}
   - component: {fileID: 1876596554506011519}
+  - component: {fileID: 8627402893283094840}
   m_Layer: 0
-  m_Name: turret
+  m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -324,7 +325,6 @@ MonoBehaviour:
   maxBullets: 20
   autoAim: 1
   bulletSpawnPoint: {fileID: 5524302694255435974}
-  target: {fileID: 0}
   sprite: {fileID: -2346302928887187388, guid: f17889f8211310f44a9ba073b7f1e86d, type: 3}
   owner: {fileID: 1876596554506011519}
   bulletPrefab: {fileID: 0}
@@ -341,10 +341,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63c707ee8d1c6484e82e17d8a5187d8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onKilled:
-    m_PersistentCalls:
-      m_Calls: []
   maxHealth: 100
   health: 100
   priorityTargettingRatio: 1
   team: 1
+--- !u!208 &8627402893283094840
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6586152027544963197}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.1, y: 0.00001, z: 0.1}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5

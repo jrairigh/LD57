@@ -21,7 +21,7 @@ namespace LD57
         public void Start()
         {
             eventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<KillableEventHandler>();
-            eventHandler?.onSpawned?.Invoke(this);
+            eventHandler?.NotifyOnSpawned(this);
         }
 
         public void Heal(Killable healer, float healAmount)
@@ -44,7 +44,7 @@ namespace LD57
 
             if (health <= 0)
             {
-                eventHandler?.onKilled?.Invoke(this);
+                eventHandler?.NotifyOnKilled(this);
                 Destroy(gameObject);
             }
 

@@ -1,3 +1,4 @@
+using Assets.src;
 using UnityEngine;
 
 namespace LD57
@@ -16,21 +17,18 @@ namespace LD57
         public bool autoAim;
         [Tooltip("The point where the bullets are spawned.")]
         public Transform bulletSpawnPoint;
-        [Tooltip("The target to aim at.")]
-        public Transform target;
         [Tooltip("The sprite to use for bullets.")]
         public Sprite sprite;
         [Tooltip("The owner of this aim controller.")]
         public Killable owner;
 
-        public BulletController bulletPrefab;
-        public Transform bulletsParent;
-
+        private BulletController m_bulletPrefab;
         private BulletController[] m_bullets;
         private int m_bulletIndex = 0;
         private float m_shootDelay = 0;
         private bool m_canShoot;
         private bool m_isShooting;
+        private AutoTargetSelector m_autoTargetSelector;
 
         public void StartShooting()
         {
@@ -42,12 +40,36 @@ namespace LD57
             m_isShooting = false;
         }
 
+        void Awake()
+        {
+            m_bulletPrefab = Resources.Load<BulletController>("Prefabs/Bullet");
+        }
+
         void Start()
         {
             m_bullets = new BulletController[maxBullets];
             for (int i = 0; i < maxBullets; ++i)
             {
-                m_bullets[i] = Instantiate(bulletPrefab, transform.position, Quaternion.identity, bulletsParent);
+                m_bullets[i] = Instantiate(m_bulletPrefab, transform.position, Quaternion.identity);
+            }
+
+            if (autoAim)
+            {
+                if (m_autoTargetSelector == null)
+                {
+                    m_autoTargetSelector = new AutoTargetSelector(owner.gameObject);
+                }
+
+                m_autoTargetSelector.DetectTargets();
+                m_autoTargetSelector.SetupTargetDetection();
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (autoAim)
+            {
+                m_autoTargetSelector.DisableTargetDetection();
             }
         }
 
@@ -57,6 +79,8 @@ namespace LD57
 
             if (autoAim)
             {
+                var target = m_autoTargetSelector.SelectTarget()?.target.transform;
+
                 if (target != null)
                 {
                     Vector3 direction = (target.position - transform.position).normalized;
@@ -74,6 +98,12 @@ namespace LD57
                 {
                     m_isShooting = false;
                 }
+
+                if (target != null && target.gameObject.scene.IsValid())
+                {
+                    float angle = Utility.AngleTo(bulletSpawnPoint.transform.position, target.transform.position) - 90f;
+                    bulletSpawnPoint.transform.rotation = Quaternion.Euler(0, 0, angle);
+                }
             }
         }
 
@@ -83,7 +113,7 @@ namespace LD57
             m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
 
             float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
-            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
+            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * bulletSpawnPoint.transform.rotation * Vector3.up;
             bulletDirection.Normalize();
 
             m_bullets[nextBullet].OnShoot(owner, bulletSpawnPoint.position, bulletDirection, sprite);
