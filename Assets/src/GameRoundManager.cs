@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -83,12 +82,25 @@ namespace LD57
             killableEventHandler.onSpawned.AddListener(GameRoundAddKillable);
             killableEventHandler.onKilled.AddListener(GameRoundRemoveKillable);
 
+            var spawners = GameObject.FindObjectsByType<EnemySpawnController>(FindObjectsSortMode.None);
+            foreach (var spawner in spawners)
+            {
+                spawner.SpawnEnemies();
+            }
+
             playerTeam = GameObject.FindGameObjectWithTag("Player").GetComponent<Killable>().team;
         }
 
         private void GameRoundAddKillable(Killable killable)
         {
-            aliveKillables[killable.team]++;
+            if (!aliveKillables.ContainsKey(killable.team))
+            {
+                aliveKillables.Add(killable.team, 1);
+            }
+            else
+            {
+                aliveKillables[killable.team]++;
+            }
         }
 
         private void GameRoundRemoveKillable(Killable killable)
