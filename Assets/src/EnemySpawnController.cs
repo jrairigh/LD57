@@ -20,8 +20,9 @@ namespace LD57
         {
             for (int i = 0; i < enemyCount; i++)
             {
-                Vector2 spawnPosition = spawnRadius * Random.insideUnitCircle;
-                Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+                Vector3 spawnPosition = spawnRadius * Random.insideUnitCircle;
+                spawnPosition.z = 0;
+                Instantiate(enemyPrefab, transform.position + spawnPosition, Quaternion.identity);
             }
         }
     }
