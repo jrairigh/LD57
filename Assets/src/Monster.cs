@@ -16,11 +16,15 @@ namespace LD57
         public float attackDamage = 20.0f;
         public float attackCooldown = 1;
         public float attackRange = 1;
+
         [Tooltip("How much coins the monster holds")]
         public int purseSize = 10;
         [Tooltip("How much force to apply to the coins when they are dropped")]
         public float coinExplosionForce = 10.0f;
-        public Coin coinPrefab;
+        public Coin coinPrefab;       
+        private List<KillableTarget> m_targetables = new();
+        private KillableTarget m_primaryTarget = null;
+        private KillableTarget m_lastPrimaryTarget = null;
         private float m_lastAttackTime = float.MinValue;
         private NavMeshAgent m_agent = null;
         private AutoTargetSelector m_autoTargetSelector = null;
@@ -62,7 +66,7 @@ namespace LD57
             m_autoTargetSelector.DisableTargetDetection();
         }
 
-        void Update()
+        protected virtual void Update()
         {
             var target = m_autoTargetSelector.SelectTarget();
             if (target == null)
@@ -82,7 +86,7 @@ namespace LD57
 
         protected virtual bool CanAttackTarget(KillableTarget killableTarget)
         {
-            return killableTarget.distance <= attackRange && m_lastAttackTime + attackCooldown <= Time.time;
+            return killableTarget.distance <= attackRange;
         }
 
         protected abstract void AttackTarget(KillableTarget killableTarget);
@@ -105,12 +109,7 @@ namespace LD57
 
         protected void DamageKillable(Killable target)
         {
-            if (m_lastAttackTime + attackCooldown > Time.time)
-            {
-                return;
-            }
-
-            target.Damage(GetComponent<Killable>(), attackDamage);
+            target.TryDamage(GetComponent<Killable>(), attackDamage);
             m_lastAttackTime = Time.time;
         }
     }

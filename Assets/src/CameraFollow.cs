@@ -14,7 +14,10 @@ namespace LD57
 
         void Update()
         {
-            transform.position = player.transform.position + cameraOffset;
+            if (player.scene.IsValid())
+            {
+                transform.position = player.transform.position + cameraOffset;
+            }
         }
     }
 }
