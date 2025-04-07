@@ -48,7 +48,6 @@ namespace LD57
             for (int i = 0; i < maxBullets; ++i)
             {
                 m_bullets[i] = Instantiate(bulletPrefab, transform.position, Quaternion.identity, bulletsParent);
-                m_bullets[i].creator = creator;
             }
         }
 

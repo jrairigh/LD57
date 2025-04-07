@@ -190,9 +190,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63c707ee8d1c6484e82e17d8a5187d8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onKilled:
-    m_PersistentCalls:
-      m_Calls: []
   maxHealth: 100
   health: 100
   priorityTargettingRatio: 1
@@ -236,3 +233,6 @@ MonoBehaviour:
   attackDamage: 20
   attackCooldown: 1
   attackRange: 1
+  purseSize: 10
+  coinExplosionForce: 10
+  coinPrefab: {fileID: 8783142981346280109, guid: 372dcac06de140945b8e48726436c397, type: 3}

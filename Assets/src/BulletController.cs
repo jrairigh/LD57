@@ -42,7 +42,7 @@ namespace LD57
         {
             var victim = collision.collider;
 
-            if(killable != null && m_owner != null && victim.TryGetComponent<Killable>(out var killable) && killable.TryDamage(creator, damage))
+            if(m_owner != null && victim.TryGetComponent<Killable>(out var killable) && killable.TryDamage(m_owner, bulletDamage))
             {
                 m_lifetime = 0;
             }
