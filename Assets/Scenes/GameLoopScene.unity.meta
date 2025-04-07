@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Scenes/GameLoopScene.unity.meta
 guid: ce893dcb9d45c1b49ae59f3e6a7e1029
-========
-guid: aa74cc947453acb49918b83db569599c
->>>>>>>> c9fca38 (Enemy Implementations (#23)):Assets/Scenes/ILPCameraFollowSampleScene 1.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 
