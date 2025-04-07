@@ -85,7 +85,7 @@ namespace LD57
             var spawners = GameObject.FindObjectsByType<EnemySpawnController>(FindObjectsSortMode.None);
             foreach (var spawner in spawners)
             {
-                spawner.SpawnEnemies();
+                spawner.StartSpawningEnemies();
             }
 
             playerTeam = GameObject.FindGameObjectWithTag("Player").GetComponent<Killable>().team;
@@ -130,6 +130,11 @@ namespace LD57
         private void GameRoundCompleteOnEnter(GameState fromState)
         {
             // TODO: Load next scene before going to next state
+            var spawners = GameObject.FindObjectsByType<EnemySpawnController>(FindObjectsSortMode.None);
+            foreach (var spawner in spawners)
+            {
+                spawner.StopSpawningEnemies();
+            }
 
             stateMachine.ChangeState(GameState.GameIdle);
         }
