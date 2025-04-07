@@ -1,4 +1,3 @@
-using Assets.src;
 using UnityEngine;
 
 namespace LD57
@@ -36,14 +35,6 @@ namespace LD57
                 sprite.flipX = xDifference < 0;
             }
 
-            var target = aimController.target;
-
-            if (target != null && target.gameObject.scene.IsValid())
-            {
-                bulletSpawn.transform.rotation = 
-                    Quaternion.Euler(0, 0, Utility.AngleTo(bulletSpawn.transform.position, aimController.target.transform.position) - 90f);
-            }
-
             lastPosition = transform.position;
         }
 
@@ -57,15 +48,12 @@ namespace LD57
             if (currentAnimation != attackAnimation)
             {
                 attackAnimator.Play(attackAnimation);
-                aimController.target = killableTarget.target.transform;
-                PauseAgent(true);
             }
         }
 
         private void AttackAnimationEnd()
         {
             attackAnimator.Play(idleAnimation);
-            PauseAgent(false);
         }
     }
 }

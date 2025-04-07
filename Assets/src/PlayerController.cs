@@ -14,7 +14,7 @@ namespace LD57
         [Tooltip("How much money the player has.")]
         public int money = 100;
         public AimController aimController;
-        public GameObject turretPrefab;
+        GameObject m_turretPrefab;
         PlayerInput m_playerInput;
         InputAction m_moveAction;
         InputAction m_attackAction;
@@ -39,6 +39,7 @@ namespace LD57
 
         void Awake()
         {
+            m_turretPrefab = Resources.Load<GameObject>("Prefabs/Turret");
             m_animationControl = GetComponent<PlayerAnimationController>();
             m_playerInput = GetComponent<PlayerInput>();
             m_playerSprite = GetComponent<SpriteRenderer>();
@@ -136,7 +137,7 @@ namespace LD57
 
             float faceDirection = !m_playerSprite.flipX ? 1 : -1;
             Vector3 position = transform.position + faceDirection * transform.right;
-            GameObject turret = Instantiate(turretPrefab, position, Quaternion.identity);
+            GameObject turret = Instantiate(m_turretPrefab, position, Quaternion.identity);
             turret.SetActive(true);
         }
 

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
@@ -21,8 +19,7 @@ namespace LD57
         public int purseSize = 10;
         [Tooltip("How much force to apply to the coins when they are dropped")]
         public float coinExplosionForce = 10.0f;
-        public Coin coinPrefab;
-        private float m_lastAttackTime = float.MinValue;
+        private Coin m_coinPrefab;
         private NavMeshAgent m_agent = null;
         private AutoTargetSelector m_autoTargetSelector = null;
 
@@ -31,7 +28,7 @@ namespace LD57
             Coin[] coins = new Coin[purseSize];
             for(int i = 0; i < purseSize; ++i)
             {
-                coins[i] = Instantiate(coinPrefab, transform.position, Quaternion.identity);
+                coins[i] = Instantiate(m_coinPrefab, transform.position, Quaternion.identity);
                 coins[i].gameObject.SetActive(true);
             }
 
@@ -41,6 +38,11 @@ namespace LD57
                 Vector2 force = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
                 rb.AddForce(coinExplosionForce * force, ForceMode2D.Impulse);
             }
+        }
+
+        void Awake()
+        {
+            m_coinPrefab = Resources.Load<Coin>("Prefabs/Coin");
         }
 
         void Start()
@@ -92,7 +94,6 @@ namespace LD57
         {
             var target = killableTarget.target;
             float angle = Mathf.Atan2(target.transform.position.y - transform.position.y, target.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
-            GetComponent<Rigidbody2D>().SetRotation(Quaternion.RotateTowards(transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward), Time.deltaTime * rotationSpeed));
             m_agent.SetDestination(target.transform.position);
         }
 
@@ -107,7 +108,6 @@ namespace LD57
         protected void DamageKillable(Killable target)
         {
             target.TryDamage(GetComponent<Killable>(), attackDamage);
-            m_lastAttackTime = Time.time;
         }
     }
 }
