@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 4bb5c1ad8106f0148926ba8b40be6f52
+guid: 849047a65b446e04cb44f46b7857cf43
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4334783836991956000
-    second: player_0
+      213: 6513147297550873935
+    second: hero_ranger_0
+  - first:
+      213: -3254127014571752726
+    second: hero_ranger_1
+  - first:
+      213: 113261503073217383
+    second: hero_ranger_2
+  - first:
+      213: -837702223419625011
+    second: hero_ranger_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +109,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: player_0
+      name: hero_ranger_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 39
-        height: 45
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        y: 245
+        width: 55
+        height: 55
+      alignment: 9
+      pivot: {x: 0.49090907, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 024a20edeee382c30800000000000000
-      internalID: 4334783836991956000
+      spriteID: f45b05085f8536a50800000000000000
+      internalID: 6513147297550873935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_ranger_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 190
+        width: 55
+        height: 55
+      alignment: 9
+      pivot: {x: 0.43636364, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae2c27aa8b407d2d0800000000000000
+      internalID: -3254127014571752726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_ranger_2
+      rect:
+        serializedVersion: 2
+        x: 55
+        y: 190
+        width: 55
+        height: 55
+      alignment: 9
+      pivot: {x: 0.43636364, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76be769acb2629100800000000000000
+      internalID: 113261503073217383
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_ranger_3
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 190
+        width: 55
+        height: 55
+      alignment: 9
+      pivot: {x: 0.43636364, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc1b4812442ef54f0800000000000000
+      internalID: -837702223419625011
       vertices: []
       indices: 
       edges: []
@@ -125,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 29c71e97a0548ae478aa09a097b0735f
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +210,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      player_0: 4334783836991956000
+      hero_ranger_0: 6513147297550873935
+      hero_ranger_1: -3254127014571752726
+      hero_ranger_2: 113261503073217383
+      hero_ranger_3: -837702223419625011
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

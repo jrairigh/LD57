@@ -77,6 +77,18 @@ namespace LD57
             }
         }
 
+        public void Shoot()
+        {
+            int nextBullet = m_bulletIndex;
+            m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
+
+            float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
+            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
+            bulletDirection.Normalize();
+
+            m_bullets[nextBullet].OnShoot(owner, bulletSpawnPoint.position, bulletDirection, sprite);
+        }
+
         void FireBullets()
         {
             if (!m_isShooting)
@@ -93,13 +105,7 @@ namespace LD57
             }
 
             m_shootDelay = shootDelay;
-            int nextBullet = m_bulletIndex;
-            m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
-
-            float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
-            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
-            bulletDirection.Normalize();
-            m_bullets[nextBullet].OnShoot(owner, bulletSpawnPoint.position, bulletDirection, sprite);
+            Shoot();
         }
 
         void OnDrawGizmos()
