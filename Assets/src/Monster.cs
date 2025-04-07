@@ -23,7 +23,6 @@ namespace LD57
         public Coin coinPrefab;
         private List<KillableTarget> m_targetables = new();
         private KillableTarget m_primaryTarget = null;
-        private KillableTarget m_lastPrimaryTarget = null;
         private float m_lastAttackTime = float.MinValue;
         private NavMeshAgent agent = null;
         private NavMeshPath path = null;
@@ -89,52 +88,6 @@ namespace LD57
             else
             {
                 MoveTowardsTarget(m_primaryTarget);
-            }
-        }
-
-        void OnCollisionEnter2D(Collision2D collision)
-        {
-            var collisionKillable = collision.gameObject.GetComponent<Killable>();
-            if (collisionKillable == null)
-            {
-                return;
-            }
-
-            if (m_primaryTarget?.target == collisionKillable)
-            {
-                agent.isStopped = true;
-                agent.velocity = Vector3.zero;
-                m_lastPrimaryTarget = m_primaryTarget;
-            }
-        }
-
-        private void OnCollisionStay2D(Collision2D collision)
-        {
-            var collisionKillable = collision.gameObject.GetComponent<Killable>();
-            if (collisionKillable == null)
-            {
-                return;
-            }
-
-            if (m_lastPrimaryTarget?.target != m_primaryTarget?.target)
-            {
-                agent.isStopped = false;
-                m_lastPrimaryTarget = null;
-            }
-        }
-
-        void OnCollisionExit2D(Collision2D collision)
-        {
-            var collisionKillable = collision.gameObject.GetComponent<Killable>();
-            if (collisionKillable == null)
-            {
-                return;
-            }
-
-            if (m_lastPrimaryTarget?.target != m_primaryTarget?.target || m_primaryTarget?.target == collisionKillable)
-            {
-                agent.isStopped = false;
-                m_lastPrimaryTarget = null;
             }
         }
 
