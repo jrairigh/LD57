@@ -40,7 +40,7 @@ namespace LD57
             }
         }
 
-        void Awake()
+        protected void Awake()
         {
             m_coinPrefab = Resources.Load<Coin>("Prefabs/Coin");
         }
