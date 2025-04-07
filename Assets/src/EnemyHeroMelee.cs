@@ -52,7 +52,7 @@ namespace LD57
             if (currentAnimation != attackAnimation)
             {
                 attackAnimator.Play(attackAnimation);
-                PauseAgent(true);
+                //PauseAgent(true);
                 target = killableTarget;
             }
         }
@@ -60,7 +60,7 @@ namespace LD57
         private void AttackAnimationEnd()
         {
             attackAnimator.Play(idleAnimation);
-            PauseAgent(false);
+            //PauseAgent(false);
         }
     }
 }

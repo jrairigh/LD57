@@ -98,7 +98,13 @@ namespace LD57
 
         public void AddTarget(Killable target)
         {
-            if (target.team == m_gameObject.GetComponent<Killable>().team)
+            var killable = m_gameObject.GetComponent<Killable>();
+            if (killable == null)
+            {
+                return;
+            }
+
+            if (target.team == killable.team)
             {
                 return;
             }
@@ -108,6 +114,7 @@ namespace LD57
                 target = target,
                 distance = float.MaxValue
             };
+            
             UpdateDistanceToTarget(killableTarget);
             m_targetables.Add(killableTarget);
 

@@ -1,3 +1,4 @@
+using Assets.src;
 using UnityEngine;
 
 namespace LD57
@@ -21,9 +22,7 @@ namespace LD57
         [Tooltip("The owner of this aim controller.")]
         public Killable owner;
 
-        public BulletController bulletPrefab;
-        public Transform bulletsParent;
-
+        private BulletController m_bulletPrefab;
         private BulletController[] m_bullets;
         private int m_bulletIndex = 0;
         private float m_shootDelay = 0;
@@ -41,19 +40,24 @@ namespace LD57
             m_isShooting = false;
         }
 
+        void Awake()
+        {
+            m_bulletPrefab = Resources.Load<BulletController>("Prefabs/Bullet");
+        }
+
         void Start()
         {
             m_bullets = new BulletController[maxBullets];
             for (int i = 0; i < maxBullets; ++i)
             {
-                m_bullets[i] = Instantiate(bulletPrefab, transform.position, Quaternion.identity, bulletsParent);
+                m_bullets[i] = Instantiate(m_bulletPrefab, transform.position, Quaternion.identity, transform);
             }
 
             if (autoAim)
             {
                 if (m_autoTargetSelector == null)
                 {
-                    m_autoTargetSelector = new AutoTargetSelector(gameObject);
+                    m_autoTargetSelector = new AutoTargetSelector(owner.gameObject);
                 }
 
                 m_autoTargetSelector.DetectTargets();
@@ -94,6 +98,12 @@ namespace LD57
                 {
                     m_isShooting = false;
                 }
+
+                if (target != null && target.gameObject.scene.IsValid())
+                {
+                    float angle = Utility.AngleTo(bulletSpawnPoint.transform.position, target.transform.position) - 90f;
+                    bulletSpawnPoint.transform.rotation = Quaternion.Euler(0, 0, angle);
+                }
             }
         }
 
@@ -103,7 +113,7 @@ namespace LD57
             m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
 
             float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
-            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
+            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * bulletSpawnPoint.transform.rotation * Vector3.up;
             bulletDirection.Normalize();
 
             m_bullets[nextBullet].OnShoot(owner, bulletSpawnPoint.position, bulletDirection, sprite);
