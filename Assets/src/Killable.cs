@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace LD57
 {
@@ -12,18 +11,17 @@ namespace LD57
 
     public class Killable : MonoBehaviour
     {
-        public UnityEvent<Killable> onKilled;
         public float maxHealth = 100.0f;
         public float health = 100.0f;
         public float priorityTargettingRatio = 1.0f;
         public Team team = Team.Neutral;
 
+        private KillableEventHandler eventHandler;
+
         public void Start()
         {
-            if (onKilled == null)
-            {
-                onKilled = new UnityEvent<Killable>();
-            }
+            eventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<KillableEventHandler>();
+            eventHandler?.onSpawned?.Invoke(this);
         }
 
         public void Heal(Killable healer, float healAmount)
@@ -46,7 +44,7 @@ namespace LD57
 
             if (health <= 0)
             {
-                onKilled?.Invoke(this);
+                eventHandler?.onKilled?.Invoke(this);
                 Destroy(gameObject);
             }
 
