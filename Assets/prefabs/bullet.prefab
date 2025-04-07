@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   lifetime: 2
+  bulletDamage: 10
   spriteGameObject: {fileID: 7650033685522506469}
 --- !u!58 &1599553923348517412
 CircleCollider2D:

@@ -276,21 +276,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63c707ee8d1c6484e82e17d8a5187d8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onKilled:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 559796703748590}
-        m_TargetAssemblyTypeName: LD57.Monster, Assembly-CSharp
-        m_MethodName: DropLoot
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   maxHealth: 100
   health: 100
   priorityTargettingRatio: 1

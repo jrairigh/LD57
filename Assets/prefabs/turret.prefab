@@ -325,7 +325,6 @@ MonoBehaviour:
   maxBullets: 20
   autoAim: 1
   bulletSpawnPoint: {fileID: 5524302694255435974}
-  target: {fileID: 0}
   sprite: {fileID: -2346302928887187388, guid: f17889f8211310f44a9ba073b7f1e86d, type: 3}
   owner: {fileID: 1876596554506011519}
   bulletPrefab: {fileID: 0}

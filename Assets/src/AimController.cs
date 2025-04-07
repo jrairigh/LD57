@@ -16,8 +16,6 @@ namespace LD57
         public bool autoAim;
         [Tooltip("The point where the bullets are spawned.")]
         public Transform bulletSpawnPoint;
-        [Tooltip("The target to aim at.")]
-        public Transform target;
         [Tooltip("The sprite to use for bullets.")]
         public Sprite sprite;
         [Tooltip("The owner of this aim controller.")]
@@ -31,6 +29,7 @@ namespace LD57
         private float m_shootDelay = 0;
         private bool m_canShoot;
         private bool m_isShooting;
+        private AutoTargetSelector m_autoTargetSelector;
 
         public void StartShooting()
         {
@@ -49,6 +48,25 @@ namespace LD57
             {
                 m_bullets[i] = Instantiate(bulletPrefab, transform.position, Quaternion.identity, bulletsParent);
             }
+
+            if (autoAim)
+            {
+                if (m_autoTargetSelector == null)
+                {
+                    m_autoTargetSelector = new AutoTargetSelector(gameObject);
+                }
+
+                m_autoTargetSelector.DetectTargets();
+                m_autoTargetSelector.SetupTargetDetection();
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (autoAim)
+            {
+                m_autoTargetSelector.DisableTargetDetection();
+            }
         }
 
         private void Update()
@@ -57,6 +75,8 @@ namespace LD57
 
             if (autoAim)
             {
+                var target = m_autoTargetSelector.SelectTarget()?.target.transform;
+
                 if (target != null)
                 {
                     Vector3 direction = (target.position - transform.position).normalized;
