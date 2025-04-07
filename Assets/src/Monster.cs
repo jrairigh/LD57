@@ -201,7 +201,14 @@ namespace LD57
 
         public void RemoveTarget(Killable killable)
         {
-            m_targetables.RemoveAll(x => x.target == killable);
+            if (killable == GetComponent<Killable>())
+            {
+                DropLoot();
+            }
+            else
+            {
+                m_targetables.RemoveAll(x => x.target == killable);
+            }
         }
 
         public void AddTarget(Killable target)
