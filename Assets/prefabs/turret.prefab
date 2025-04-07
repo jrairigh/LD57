@@ -326,6 +326,7 @@ MonoBehaviour:
   bulletSpawnPoint: {fileID: 0}
   target: {fileID: 0}
   sprite: {fileID: 0}
+  creator: {fileID: 1876596554506011519}
   bulletPrefab: {fileID: 0}
   bulletsParent: {fileID: 0}
 --- !u!114 &1876596554506011519

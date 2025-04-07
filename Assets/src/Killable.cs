@@ -34,12 +34,12 @@ namespace LD57
             }
         }
 
-        public void Damage(Killable damager, float damageAmount)
+        public bool TryDamage(Killable damager, float damageAmount)
         {
             if (damager.team == team)
             {
                 // No friendly fire
-                return;
+                return false;
             }
 
             health -= damageAmount;
@@ -49,6 +49,8 @@ namespace LD57
                 onKilled?.Invoke(this);
                 Destroy(gameObject);
             }
+
+            return true;
         }
     }
 }

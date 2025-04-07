@@ -1,3 +1,4 @@
+using Assets.src;
 using UnityEngine;
 
 namespace LD57
@@ -8,8 +9,9 @@ namespace LD57
         private const string attackAnimation = "HeroRangerAttack";
 
         private SpriteRenderer sprite;
-        private KillableTarget target;
         private Animator attackAnimator;
+        private Transform bulletSpawn;
+        private AimController aimController;
         private Vector3 lastPosition;
 
         private string currentAnimation => attackAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
@@ -18,6 +20,8 @@ namespace LD57
         {
             sprite = GetComponent<SpriteRenderer>();
             attackAnimator = GetComponent<Animator>();
+            bulletSpawn = transform.GetChild(0);
+            aimController = bulletSpawn.GetComponent<AimController>();
             attackAnimator.Play(idleAnimation);
         }
 
@@ -32,19 +36,20 @@ namespace LD57
                 sprite.flipX = xDifference < 0;
             }
 
+            var target = aimController.target;
+
+            if (target != null && target.gameObject.scene.IsValid())
+            {
+                bulletSpawn.transform.rotation = 
+                    Quaternion.Euler(0, 0, Utility.AngleTo(bulletSpawn.transform.position, aimController.target.transform.position) - 90f);
+            }
+
             lastPosition = transform.position;
         }
 
         public void DoDamage()
         {
-            if (target is null)
-            {
-                return;
-            }
-
-            DamageKillable(target.target);
-
-            target = null;
+            aimController.Shoot();
         }
 
         protected override void AttackTarget(KillableTarget killableTarget)
@@ -52,8 +57,8 @@ namespace LD57
             if (currentAnimation != attackAnimation)
             {
                 attackAnimator.Play(attackAnimation);
+                aimController.target = killableTarget.target.transform;
                 PauseAgent(true);
-                target = killableTarget;
             }
         }
 

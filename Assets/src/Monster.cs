@@ -122,8 +122,11 @@ namespace LD57
 
         protected virtual void MoveTowardsTarget(KillableTarget killableTarget)
         {
-            var target = killableTarget.target;
-            agent.SetDestination(target.transform.position);
+            if (agent.enabled)
+            {
+                var target = killableTarget.target;
+                agent.SetDestination(target.transform.position);
+            }
         }
 
         protected void PauseAgent(bool pause)
@@ -187,7 +190,7 @@ namespace LD57
 
         protected void DamageKillable(Killable target)
         {
-            target.Damage(GetComponent<Killable>(), attackDamage);
+            target.TryDamage(GetComponent<Killable>(), attackDamage);
             m_lastAttackTime = Time.time;
         }
 

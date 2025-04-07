@@ -4,9 +4,16 @@ namespace LD57
 {
     public class BulletController : MonoBehaviour
     {
+        [Tooltip("The damage the bullet does")]
+        public float damage = 10f;
+        [Tooltip("The speed of the bullet")]
         public float speed = 10f;
+        [Tooltip("The life time of the bullet in seconds")]
         public float lifetime = 2f;
+        [Tooltip("The game object containing the sprite")]
         public GameObject spriteGameObject;
+        [Tooltip("The creator of the bullet")]
+        public Killable creator;
 
         private Vector2 m_direction;
         private float m_lifetime;
@@ -35,10 +42,12 @@ namespace LD57
 
         void OnCollisionEnter2D(Collision2D collision)
         {
-            Debug.Log("Bullet hit: " + collision.gameObject.name);
-            m_lifetime = 0;
+            var victim = collision.gameObject;
 
-            // tell objects that it was hit by a bullet
+            if(victim.TryGetComponent<Killable>(out var killable) && killable.TryDamage(creator, damage))
+            {
+                m_lifetime = 0;
+            }            
         }
     }
 }

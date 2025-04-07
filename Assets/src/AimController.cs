@@ -20,6 +20,8 @@ namespace LD57
         public Transform target;
         [Tooltip("The sprite to use for bullets.")]
         public Sprite sprite;
+        [Tooltip("The \"creator\" of the bullets.")]
+        public Killable creator;
 
         public BulletController bulletPrefab;
         public Transform bulletsParent;
@@ -46,6 +48,7 @@ namespace LD57
             for(int i = 0; i < maxBullets; ++i)
             {
                 m_bullets[i] = Instantiate(bulletPrefab, transform.position, Quaternion.identity, bulletsParent);
+                m_bullets[i].creator = creator;
             }
         }
 
@@ -68,6 +71,18 @@ namespace LD57
             }
         }
 
+        public void Shoot()
+        {
+            int nextBullet = m_bulletIndex;
+            m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
+
+            float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
+            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
+            bulletDirection.Normalize();
+
+            m_bullets[nextBullet].OnShoot(bulletSpawnPoint.position, bulletDirection, sprite);
+        }
+
         void FireBullets()
         {
             if(!m_isShooting)
@@ -84,14 +99,7 @@ namespace LD57
             }
 
             m_shootDelay = shootDelay;
-            int nextBullet = m_bulletIndex;
-            m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
-
-            float angle = Random.Range(-bulletSprayCone, bulletSprayCone);
-            Vector3 bulletDirection = Quaternion.Euler(0, 0, angle) * transform.up;
-            bulletDirection.Normalize();
-            
-            m_bullets[nextBullet].OnShoot(bulletSpawnPoint.position, bulletDirection, sprite);
+            Shoot();
         }
 
         void OnDrawGizmos()
