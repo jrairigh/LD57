@@ -40,12 +40,11 @@ namespace LD57
 
         void OnCollisionEnter2D(Collision2D collision)
         {
-            m_lifetime = 0;
+            var victim = collision.collider;
 
-            var killable = collision.collider.GetComponent<Killable>();
-            if(killable != null && m_owner != null)
+            if(m_owner != null && victim.TryGetComponent<Killable>(out var killable) && killable.TryDamage(m_owner, bulletDamage))
             {
-                killable.Damage(m_owner, bulletDamage);
+                m_lifetime = 0;
             }
         }
     }
