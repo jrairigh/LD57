@@ -50,7 +50,7 @@ namespace LD57
             m_bullets = new BulletController[maxBullets];
             for (int i = 0; i < maxBullets; ++i)
             {
-                m_bullets[i] = Instantiate(m_bulletPrefab, transform.position, Quaternion.identity, transform);
+                m_bullets[i] = Instantiate(m_bulletPrefab, transform.position, Quaternion.identity);
             }
 
             if (autoAim)
