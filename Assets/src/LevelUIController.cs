@@ -6,7 +6,7 @@ public class LevelUIController : MonoBehaviour
 {
     private const string DepthText = "Depth {0}";
     private const string RemainingEnemiesText = "{0} Heros Remain";
-    private const int HealthFillMaxWidth = 168;
+    private const int HealthFillMaxWidth = 164;
 
     public GameRoundManager gameRoundManager;
     public GameObject DepthGameObject;
