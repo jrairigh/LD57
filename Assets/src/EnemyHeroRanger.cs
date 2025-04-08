@@ -42,7 +42,7 @@ namespace LD57
 
         public void DoDamage()
         {
-            aimController.Shoot();
+            aimController.EnemyShoot();
         }
 
         protected override void AttackTarget(KillableTarget killableTarget)

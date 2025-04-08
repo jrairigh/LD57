@@ -29,6 +29,7 @@ namespace LD57
         private bool m_canShoot;
         private bool m_isShooting;
         private AutoTargetSelector m_autoTargetSelector;
+        private Transform m_playerTransform;
 
         public void StartShooting()
         {
@@ -43,6 +44,7 @@ namespace LD57
         void Awake()
         {
             m_bulletPrefab = Resources.Load<BulletController>("Prefabs/Bullet");
+            m_playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         }
 
         void Start()
@@ -105,6 +107,14 @@ namespace LD57
                     bulletSpawnPoint.transform.rotation = Quaternion.Euler(0, 0, angle);
                 }
             }
+        }
+
+        public void EnemyShoot()
+        {
+            int nextBullet = m_bulletIndex;
+            m_bulletIndex = (m_bulletIndex + 1) % maxBullets;
+            Vector3 bulletDirection = (m_playerTransform.position - transform.position).normalized;
+            m_bullets[nextBullet].OnShoot(owner, bulletSpawnPoint.position, bulletDirection, sprite);
         }
 
         public void Shoot()
