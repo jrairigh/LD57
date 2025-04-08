@@ -236,7 +236,6 @@ MonoBehaviour:
   attackRange: 4
   purseSize: 10
   coinExplosionForce: 10
-  coinPrefab: {fileID: 8783142981346280109, guid: 372dcac06de140945b8e48726436c397, type: 3}
 --- !u!1 &4908286662005645401
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,8 +286,5 @@ MonoBehaviour:
   maxBullets: 1
   autoAim: 0
   bulletSpawnPoint: {fileID: 4986533275072214412}
-  target: {fileID: 0}
   sprite: {fileID: -765150924802650856, guid: 1c518dcaf95ab1b4d846a952aac7b61a, type: 3}
   owner: {fileID: 0}
-  bulletPrefab: {fileID: 8334179044058134890, guid: 277af5fdbeef80b4a887433d6bcd5bb8, type: 3}
-  bulletsParent: {fileID: 0}

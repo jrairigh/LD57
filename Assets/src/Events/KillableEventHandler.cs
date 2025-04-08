@@ -8,6 +8,7 @@ namespace LD57
     {
         public UnityEvent<Killable> onSpawned;
         public UnityEvent<Killable> onKilled;
+        public UnityEvent<Killable> onDamaged;
 
         private NavMeshSurface navMeshSurface;
 
@@ -29,6 +30,10 @@ namespace LD57
         {
             onKilled.Invoke(killableKilled);
             navMeshSurface.BuildNavMeshAsync();
+        }
+        public void NotifyOnDamaged(Killable killableKilled)
+        {
+            onDamaged.Invoke(killableKilled);
         }
     }
 }
