@@ -235,4 +235,3 @@ MonoBehaviour:
   attackRange: 1
   purseSize: 10
   coinExplosionForce: 10
-  coinPrefab: {fileID: 8783142981346280109, guid: 372dcac06de140945b8e48726436c397, type: 3}

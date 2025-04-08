@@ -10,12 +10,24 @@ namespace LD57
         [Tooltip("Time during idle stage of the game round in seconds")]
         public float idleStageSeconds = 30.0f;
 
+        public int RemainingEnemies
+        {
+            get
+            {
+                var count = 0;
+                aliveKillables.TryGetValue(Team.Team2, out count);
+                return count;
+            }
+        }
+
         private readonly StateMachine<GameState> stateMachine = new();
         private float idleTimeStart;
 
         private KillableEventHandler killableEventHandler = null;
+        private GameRoundEventHandler gameRoundEventHandler = null;
         private Dictionary<Team, int> aliveKillables = new();
         private Team playerTeam = Team.Neutral;
+        private int currentDepth;
 
         void Start()
         {
@@ -39,6 +51,7 @@ namespace LD57
                     .Permit(GameState.GameIdle); // retry?
 
             killableEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<KillableEventHandler>();
+            gameRoundEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<GameRoundEventHandler>();
             stateMachine.ChangeState(GameState.GameIdle);
         }
 
@@ -89,6 +102,9 @@ namespace LD57
             }
 
             playerTeam = GameObject.FindGameObjectWithTag("Player").GetComponent<Killable>().team;
+
+            currentDepth++;
+            gameRoundEventHandler.NotifyOnRoundStart(currentDepth);
         }
 
         private void GameRoundAddKillable(Killable killable)
