@@ -196,6 +196,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2334435243536344683, guid: 7c1822259fc68064cadd633f83b77b66, type: 3}
+      propertyPath: m_BodyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2334435243536344683, guid: 7c1822259fc68064cadd633f83b77b66, type: 3}
+      propertyPath: m_GravityScale
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2334435243536344683, guid: 7c1822259fc68064cadd633f83b77b66, type: 3}
+      propertyPath: m_LinearDamping
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2334435243536344683, guid: 7c1822259fc68064cadd633f83b77b66, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 2464230337383427370, guid: 7c1822259fc68064cadd633f83b77b66, type: 3}
+      propertyPath: moveSpeed
+      value: 350
+      objectReference: {fileID: 0}
     - target: {fileID: 2464230337383427370, guid: 7c1822259fc68064cadd633f83b77b66, type: 3}
       propertyPath: turretPrefab
       value: 
@@ -941,6 +961,9 @@ MonoBehaviour:
   onKilled:
     m_PersistentCalls:
       m_Calls: []
+  onDamaged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1047838055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -966,7 +989,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfa79fbfd25d82b4d84d9800bb6c96d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onDepthChanged:
+  onRoundStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onPlayerHealthChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onCoinChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1085945694

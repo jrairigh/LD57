@@ -28,6 +28,7 @@ namespace LD57
         private Killable m_killable;
         private KillableEventHandler killableEventHandler;
         private GameRoundEventHandler gameRoundEventHandler;
+        private Rigidbody2D m_rigidBody;
 
         public void AddMoney(int amount)
         {
@@ -54,6 +55,7 @@ namespace LD57
             m_moveAction = m_playerInput.actions["Move"];
             m_attackAction = m_playerInput.actions["Attack"];
             m_interactAction = m_playerInput.actions["Interact"];
+            m_rigidBody = GetComponent<Rigidbody2D>();
 
             killableEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<KillableEventHandler>();
             gameRoundEventHandler = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<GameRoundEventHandler>();
@@ -92,7 +94,7 @@ namespace LD57
 
             if (moveDirection.magnitude != 0)
             {
-                transform.position += Time.deltaTime * (moveSpeed * moveDirection);
+                m_rigidBody.AddForce(Time.deltaTime * (moveSpeed * moveDirection), ForceMode2D.Impulse);
 
                 if (!m_shooting)
                 {
