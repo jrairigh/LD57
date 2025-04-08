@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelUIController : MonoBehaviour
 {
     private const string DepthText = "Depth {0}";
-    private const string RemainingEnemiesText = "{0} Heros Remain";
+    private const string RemainingEnemiesText = "{0} Hero{1} Remain{2}";
     private const int HealthFillMaxWidth = 164;
 
     public GameRoundManager gameRoundManager;
@@ -41,13 +41,23 @@ public class LevelUIController : MonoBehaviour
 
     private void UpdateRemainingEnemies(Killable _)
     {
-        RemainingEnemiesTextMesh.text = string.Format(RemainingEnemiesText, gameRoundManager.RemainingEnemies);
+        var count = gameRoundManager.RemainingEnemies;
+        RemainingEnemiesTextMesh.text = string.Format(
+            RemainingEnemiesText,
+            count,
+            count == 1 ? string.Empty : "s",
+            count != 1 ? string.Empty : "s");
     }
 
     private void HandleRoundStart(int depth)
     {
+        var count = gameRoundManager.RemainingEnemies;
         DepthTextMesh.text = string.Format(DepthText, depth);
-        RemainingEnemiesTextMesh.text = string.Format(RemainingEnemiesText, gameRoundManager.RemainingEnemies);
+        RemainingEnemiesTextMesh.text = string.Format(
+            RemainingEnemiesText, 
+            count, 
+            count == 1 ? string.Empty : "s",
+            count != 1 ? string.Empty : "s");
     }
 
     private void HandlePlayerHealthChanged(Killable killable)

@@ -151,7 +151,7 @@ namespace LD57
             }
 
             Debug.Log($"Turret cost $10, total in purse ${money}");
-            money -= 10;
+            RemoveMoney(10);
 
             float faceDirection = !m_playerSprite.flipX ? 1 : -1;
             Vector3 position = transform.position + faceDirection * transform.right;
